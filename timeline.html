@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+    .axis path,
+    .axis line{
+        fill: none;
+        stroke: black;
+        shape-rendering: crispEdges;
+    }
+    .axis text{
+        font-size: 10px;
+        /*stroke: #333;*/
+        font-weight: 100;
+        font-family: "微软雅黑";
+        /*transform:rotate(90deg);*/
+    }
+
+</style>
+<svg width="960" height="1060"></svg>
+<script src="d3.v3.min.js"></script>
+<script>
+    var w = 1200;
+    var h = 500;
+    var padding = 40;
+
+    var start = new Date(2017,07,01)
+    var end = new Date(2017,07,31)
+
+    var xScale = d3.time.scale()
+            .domain([start,end])
+            .range([0,w])
+
+
+    var xAxis = d3.svg.axis()
+            .scale(xScale)
+            .orient("bottom")
+            .ticks(d3.time.day, 1)
+            .tickSize(10)
+            .tickFormat(d3.time.format('%m-%d'))
+
+
+    var zoom = d3.behavior.zoom()
+            .x(xScale)
+            .on('zoom', zoomed);
+
+    var svg = d3.select('svg')
+            .attr('width',w+2*padding)
+            .attr('height',h+2*padding)
+            .call(zoom);
+
+
+    svg.append("g")
+            .attr("class", "x axis")
+            .attr("transform", "translate("+padding+", " + h + ")")
+            .call(xAxis);
+
+    function zoomed(){
+        var scale = d3.event.scale;
+        var translate = d3.event.translate;
+        console.log('scale:'+scale,'translate:'+translate)
+    }
+
+</script>
