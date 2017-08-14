@@ -14,14 +14,28 @@
         font-family: "微软雅黑";
         /*transform:rotate(90deg);*/
     }
+    #tooltip{
+        color: #000;
+        font-size: 12px;
+    }
 
 </style>
 <svg width="960" height="1060"></svg>
 <script src="d3.v3.min.js"></script>
 <script>
-    var w = 1200;
+    var w = 1000;
     var h = 500;
     var padding = 40;
+
+    var colors = d3.range(100).map(d3.scale.category20())
+
+    var datasets = [
+        {'date':'2017-08-01','sales': 100},
+        {'date':'2017-08-02','sales': 400},
+        {'date':'2017-08-03','sales': 200},
+        {'date':'2017-08-04','sales': 700},
+        {'date':'2017-08-05','sales': 900},
+    ]
 
     var start = new Date(2017,07,01)
     var end = new Date(2017,07,31)
@@ -30,6 +44,10 @@
             .domain([start,end])
             .range([0,w])
 
+    var yScale = d3.scale.linear()
+            .domain([d3.min(datasets,function(d){return d.sales}),d3.max(datasets,function(d){return d.sales})])
+            .range([h,0]);
+
 
     var xAxis = d3.svg.axis()
             .scale(xScale)
@@ -37,6 +55,11 @@
             .ticks(d3.time.day, 1)
             .tickSize(10)
             .tickFormat(d3.time.format('%m-%d'))
+
+    var yAxis = d3.svg.axis()
+            .scale(yScale)
+            .orient("left")
+//            .tick(10)
 
 
     var zoom = d3.behavior.zoom()
@@ -48,11 +71,52 @@
             .attr('height',h+2*padding)
             .call(zoom);
 
+    svg.append("g")
+            .attr("class", "y axis")
+            .attr("transform", "translate("+padding+", 0)")
+            .call(yAxis);
+
+    // 添加bar
+    svg.selectAll('.bar')
+            .data(datasets)
+            .enter()
+            .append('rect')
+            .attr('class','bar')
+            .attr('x',function(d,i){
+                console.log(xScale(new Date(d.date)))
+                return xScale(new Date(d.date))+padding+15
+            })
+            .attr('y',function(d){
+                return h - yScale(d.sales);
+            })
+            .attr('width', function(){
+                return 30
+            })
+            .attr('height', function(d){
+                return yScale(d.sales)
+            })
+            .attr('fill',function(d,i){
+                return colors[i]
+            })
+            .on('mouseover',function(d){
+                svg.append('text')
+                        .attr('id','tooltip')
+                        .attr('x',d3.select(this).attr('x'))
+                        .attr('y',parseFloat(d3.select(this).attr('y'))-12)
+                        .attr('width',100)
+                        .attr('height',20)
+                        .attr('fill','red')
+                        .text(d.sales+'件')
+
+            }).on('mouseout',function(d){
+                d3.select('#tooltip').remove()
+            })
 
     svg.append("g")
             .attr("class", "x axis")
-            .attr("transform", "translate("+padding+", " + h + ")")
+            .attr("transform", "translate("+2*padding+", " + h + ")")
             .call(xAxis);
+
 
     function zoomed(){
         var scale = d3.event.scale;
