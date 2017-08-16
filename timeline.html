@@ -53,8 +53,8 @@
         {'date':'2017-08-25','sales': 600},
     ]
 
-    var start = new Date(2017,06,31)
-    var end = new Date(2017,07,22)
+    var start = new Date(2017,06,31);
+    var end = new Date(2017,07,22);
 
     var xScale = d3.time.scale()
             .domain([start,end])
@@ -63,7 +63,6 @@
     var yScale = d3.scale.linear()
             .domain([0,d3.max(datasets,function(d){return d.sales})])
             .range([h,0]);
-
 
     var xAxis = d3.svg.axis()
             .scale(xScale)
@@ -76,7 +75,6 @@
             .scale(yScale)
             .orient("left")
 
-
     var zoom = d3.behavior.zoom()
             .x(xScale)
             .on('zoom', zoomed);
@@ -86,10 +84,20 @@
             .attr('height',h+2*padding)
             .call(zoom);
 
+    // 添加x轴和y轴的显示
     svg.append("g")
             .attr("class", "y axis")
             .attr("transform", "translate("+padding+", "+padding+")")
             .call(yAxis);
+
+    svg.append("g")
+            .attr("class", "x axis")
+            .attr("transform", "translate("+padding+", " + (h+padding)+ ")")
+            .call(xAxis);
+
+    var tick_length = d3.selectAll('.x.axis .tick')[0].length
+    console.log('刻度长度',tick_length)
+    var barWidth = w/tick_length-1;
 
     // 添加bar
     svg.selectAll('.bar')
@@ -98,15 +106,16 @@
             .append('rect')
             .attr('class','bar')
             .attr('x',function(d,i){
-                console.log(xScale(new Date(d.date)))
-                return xScale(new Date(d.date))+15
+                var local_date = new Date(d.date).setHours(0,0)
+                console.log(xScale(local_date))
+                return xScale(local_date)+padding-barWidth/2;
             })
             .attr('y',function(d){
                 console.log('Y轴坐标',h - yScale(d.sales)+padding)
                 return yScale(d.sales)+padding;
             })
-            .attr('width', function(){
-                return 30
+            .attr('width', function(d,i){
+                return barWidth;
             })
             .attr('height', function(d){
                 console.log(yScale(d.sales))
@@ -143,10 +152,7 @@
             })
             .text(function(d){return d.sales+'件'})
 
-    svg.append("g")
-            .attr("class", "x axis")
-            .attr("transform", "translate("+padding+", " + (h+padding)+ ")")
-            .call(xAxis);
+
 
     // 添加x轴的维度标注
     svg.append("text")
