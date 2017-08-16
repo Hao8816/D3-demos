@@ -21,13 +21,24 @@
     .label{
         font-size: 12px;
     }
+    .bar{
+        cursor: pointer;
+    }
 
+    #horizontal-line{
+        stroke : #999999;
+        stroke-width: 1;
+        stroke-dasharray:  5;
+    }
+    .axis-label{
+        font-size: 12px;
+    }
 </style>
 <svg width="960" height="1060"></svg>
 <script src="d3.v3.min.js"></script>
 <script>
     var w = 1000;
-    var h = 500;
+    var h = 400;
     var padding = 40;
 
     var colors = d3.range(100).map(d3.scale.category20())
@@ -38,10 +49,12 @@
         {'date':'2017-08-03','sales': 200},
         {'date':'2017-08-04','sales': 700},
         {'date':'2017-08-05','sales': 900},
+        {'date':'2017-08-13','sales': 450},
+        {'date':'2017-08-25','sales': 600},
     ]
 
     var start = new Date(2017,06,31)
-    var end = new Date(2017,07,31)
+    var end = new Date(2017,07,22)
 
     var xScale = d3.time.scale()
             .domain([start,end])
@@ -62,7 +75,6 @@
     var yAxis = d3.svg.axis()
             .scale(yScale)
             .orient("left")
-//            .tick(10)
 
 
     var zoom = d3.behavior.zoom()
@@ -103,6 +115,20 @@
             .attr('fill',function(d,i){
                 return colors[i]
             })
+            .on('mouseover',function(d){
+                console.log(d3.select(this))
+                var point_x = d3.select(this).attr('x');
+                var point_y = d3.select(this).attr('y');
+                svg.append('line')
+                        .attr('id','horizontal-line')
+                        .attr('x1',padding)
+                        .attr('x2',point_x)
+                        .attr('y1',point_y)
+                        .attr('y2',point_y)
+            })
+            .on('mouseout',function(){
+                d3.select('#horizontal-line').remove();
+            })
 
     svg.selectAll('.label')
             .data(datasets)
@@ -115,13 +141,25 @@
             .attr('y',function(d){
                 return yScale(d.sales)+padding-5;
             })
-//            .attr('fill','red')
             .text(function(d){return d.sales+'件'})
 
     svg.append("g")
             .attr("class", "x axis")
             .attr("transform", "translate("+padding+", " + (h+padding)+ ")")
             .call(xAxis);
+
+    // 添加x轴的维度标注
+    svg.append("text")
+            .attr('class','axis-label')
+            .attr('x',w+padding+5)
+            .attr('y',h+padding)
+            .text('时间轴')
+
+    svg.append("text")
+            .attr('class','axis-label')
+            .attr('x',padding-10)
+            .attr('y',padding-10)
+            .text('销量')
 
 
     function zoomed(){
