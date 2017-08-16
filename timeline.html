@@ -18,6 +18,9 @@
         color: #000;
         font-size: 12px;
     }
+    .label{
+        font-size: 12px;
+    }
 
 </style>
 <svg width="960" height="1060"></svg>
@@ -37,7 +40,7 @@
         {'date':'2017-08-05','sales': 900},
     ]
 
-    var start = new Date(2017,07,01)
+    var start = new Date(2017,06,31)
     var end = new Date(2017,07,31)
 
     var xScale = d3.time.scale()
@@ -45,7 +48,7 @@
             .range([0,w])
 
     var yScale = d3.scale.linear()
-            .domain([d3.min(datasets,function(d){return d.sales}),d3.max(datasets,function(d){return d.sales})])
+            .domain([0,d3.max(datasets,function(d){return d.sales})])
             .range([h,0]);
 
 
@@ -73,7 +76,7 @@
 
     svg.append("g")
             .attr("class", "y axis")
-            .attr("transform", "translate("+padding+", 0)")
+            .attr("transform", "translate("+padding+", "+padding+")")
             .call(yAxis);
 
     // 添加bar
@@ -84,37 +87,40 @@
             .attr('class','bar')
             .attr('x',function(d,i){
                 console.log(xScale(new Date(d.date)))
-                return xScale(new Date(d.date))+padding+15
+                return xScale(new Date(d.date))+15
             })
             .attr('y',function(d){
-                return h - yScale(d.sales);
+                console.log('Y轴坐标',h - yScale(d.sales)+padding)
+                return yScale(d.sales)+padding;
             })
             .attr('width', function(){
                 return 30
             })
             .attr('height', function(d){
-                return yScale(d.sales)
+                console.log(yScale(d.sales))
+                return h-yScale(d.sales)
             })
             .attr('fill',function(d,i){
                 return colors[i]
             })
-            .on('mouseover',function(d){
-                svg.append('text')
-                        .attr('id','tooltip')
-                        .attr('x',d3.select(this).attr('x'))
-                        .attr('y',parseFloat(d3.select(this).attr('y'))-12)
-                        .attr('width',100)
-                        .attr('height',20)
-                        .attr('fill','red')
-                        .text(d.sales+'件')
 
-            }).on('mouseout',function(d){
-                d3.select('#tooltip').remove()
+    svg.selectAll('.label')
+            .data(datasets)
+            .enter()
+            .append('text')
+            .attr('class','label')
+            .attr('x',function(d){
+                return xScale(new Date(d.date))+15
             })
+            .attr('y',function(d){
+                return yScale(d.sales)+padding-5;
+            })
+//            .attr('fill','red')
+            .text(function(d){return d.sales+'件'})
 
     svg.append("g")
             .attr("class", "x axis")
-            .attr("transform", "translate("+2*padding+", " + h + ")")
+            .attr("transform", "translate("+padding+", " + (h+padding)+ ")")
             .call(xAxis);
 
 
