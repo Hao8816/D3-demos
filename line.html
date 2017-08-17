@@ -3,8 +3,22 @@
 <head lang="en">
     <meta charset="UTF-8">
     <title>D3学习</title>
-    <script src="d3.v4.min.js"></script>
+    <script src="d3.v3.min.js"></script>
     <style>
+
+        .axis,
+        .axis line{
+            stroke : #333;
+            stroke-width : 1;
+            fill: none;
+        }
+        .axis text{
+            font-size: 10px;
+            /*stroke: #333;*/
+            fill: none;
+            font-weight: 100;
+            /*transform:rotate(90deg);*/
+        }
 
 
     </style>
@@ -16,32 +30,96 @@
     var w = 400;
     var h = 300;
     var padding = 5;
-
-    var dataset = [5,10,15,20,25,30];
-    var svg = d3.select('body')
-            .append('svg')
-            .attr('width',w).attr('height',h);
+    var margin = 20;
 
     var monthSales = [
-        {'month':10,'sales': 0},
-        {'month':20,'sales': 80},
-        {'month':30,'sales': 80},
-        {'month':45,'sales': 110},
-        {'month':50,'sales': 120},
-        {'month':60,'sales': 130},
-        {'month':70,'sales': 100},
-        {'month':80,'sales': 130},
-        {'month':90,'sales': 120},
-        {'month':105,'sales': 110}
+        {'month':1,'sales': 0},
+        {'month':2,'sales': 80},
+        {'month':3,'sales': 80},
+        {'month':4,'sales': 110},
+        {'month':5,'sales': 120},
+        {'month':6,'sales': 130},
+        {'month':7,'sales': 100},
+        {'month':8,'sales': 130},
+        {'month':9,'sales': 120},
+        {'month':10,'sales': 110}
 
     ];
 
+
+    var dataset = [5,10,15,20,25,30];
+
+
+    var xScale = d3.scale.linear()
+            .domain([0, d3.max(monthSales,function(d){return d.month})])
+            .range([0,w]);
+    var yScale =d3.scale.linear()
+            .domain([0, d3.max(monthSales,function(d){return d.sales})])
+            .range([h,0]);
+
+    var xAxis = d3.svg.axis()
+            .orient('bottom')
+            .scale(xScale)
+
+    var yAxis = d3.svg.axis()
+            .orient('left')
+            .scale(yScale)
+
+    var svg = d3.select('body')
+            .append('svg')
+            .attr('width',w+2*margin)
+            .attr('height',h+2*margin);
+
+    svg.append('g')
+            .attr("class", "x axis")
+            .attr("transform", "translate("+margin+", "+(h+margin)+")")
+            .call(xAxis);
+
+    svg.append('g')
+            .attr("class", "y axis")
+            .attr("transform", "translate("+margin+", "+margin+")")
+            .call(yAxis);
+
     // 线条
-    var line = d3.line().x(function(d){return d.month*3}).y(function(d){return h- d.sales});
-    var path = svg.append('path').datum(monthSales).attr("d", line).attr('stroke','red').attr('stroke-width',2).attr('fill','none');
+    var line = d3.svg.line()
+            .x(function(d){return xScale(d.month)+margin})
+            .y(function(d){return yScale(d.sales)+margin});
 
+    var hoverLine = d3.svg.line()
+            .x(function(d){return xScale(d.month)+margin})
+            .y(function(d){return yScale(d.sales)+margin});
 
+    var path = svg.append('path')
+            .datum(monthSales)
+            .attr("d", line)
+            .attr('stroke','red')
+            .attr('stroke-width',2)
+            .attr('fill','none');
 
+    var point = svg.selectAll('.point')
+            .data(monthSales)
+            .enter()
+            .append('circle')
+            .attr('class','point')
+            .attr('cx',function(d){
+                return xScale(d.month)+margin
+            })
+            .attr('cy',function(d){
+                return yScale(d.sales)+margin
+            })
+            .attr('r',4)
+            .attr('fill','#dddddd')
+            .attr('stroke-opacity','0.2')
+            .on('mouseover',function(){
+                var point_x = parseFloat(d3.select(this).attr('cx'));
+                var point_y = parseFloat(d3.select(this).attr('cy'));
+                svg.append('path')
+                        .attr('id','hover-line')
+                        .attr('d', function(d){
+                            var hover = d3.svg.line()
+                            return hover([0,point_y],[point_x,point_y],[point_x,0])
+                        })
+            })
 
 </script>
 </body>

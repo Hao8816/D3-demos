@@ -43,14 +43,6 @@
         ['华为9','70'],
         ['华为11','60'],
         ['华为12','30'],
-        ['华为13','70'],
-        ['华为14','20'],
-        ['华为15','70'],
-        ['华为16','20'],
-        ['华为17','20'],
-        ['华为18','20'],
-        ['华为19','20'],
-        ['华为20','20'],
     ]
 
     var colors = d3.range(100).map(d3.scale.category20())
@@ -160,7 +152,7 @@
         }else{
             return 'end'
         }
-    }).attr('font-size','13px').text(function(d){
+    }).attr('font-size','12px').text(function(d){
         var percent = Number(d.value)/d3.sum(dataset,function(d){return d[1]})*100
         return d.data[0] + '' + percent.toFixed(1)+'%'
     })
