@@ -34,6 +34,13 @@
         font-size: 12px;
     }
 </style>
+<h4>页面功能</h4>
+<p>
+    X轴为时间轴，显示每个月份的信息，Y轴为数量轴，显示某个月对应的销量信息。通过鼠标左右拖拽来改变时间的范围。
+</p>
+<div id="timeline">
+
+</div>
 <svg width="960" height="1060"></svg>
 <script src="d3.v3.min.js"></script>
 <script>
@@ -44,14 +51,19 @@
     var colors = d3.range(100).map(d3.scale.category20())
 
     var datasets = [
-        {'date':'2017-08-01','sales': 100},
-        {'date':'2017-08-02','sales': 400},
-        {'date':'2017-08-03','sales': 200},
-        {'date':'2017-08-04','sales': 700},
-        {'date':'2017-08-05','sales': 900},
-        {'date':'2017-08-13','sales': 450},
-        {'date':'2017-08-25','sales': 600},
-    ]
+        {'date': new Date(2017,07,01),'sales': 100},
+        {'date': new Date(2017,07,02),'sales': 400},
+        {'date': new Date(2017,07,03),'sales': 200},
+        {'date': new Date(2017,07,04),'sales': 700},
+        {'date': new Date(2017,07,10),'sales': 900},
+        {'date': new Date(2017,07,15),'sales': 450},
+        {'date': new Date(2017,07,18),'sales': 600},
+        {'date': new Date(2017,07,20),'sales': 600},
+        {'date': new Date(2017,07,22),'sales': 800},
+        {'date': new Date(2017,07,25),'sales': 500},
+        {'date': new Date(2017,07,27),'sales': 400},
+        {'date': new Date(2017,07,31),'sales': 200}
+    ];
 
     var start = new Date(2017,06,31);
     var end = new Date(2017,07,22);
@@ -75,14 +87,9 @@
             .scale(yScale)
             .orient("left")
 
-    var zoom = d3.behavior.zoom()
-            .x(xScale)
-            .on('zoom', zoomed);
-
     var svg = d3.select('svg')
             .attr('width',w+2*padding)
-            .attr('height',h+2*padding)
-            .call(zoom);
+            .attr('height',h+2*padding);
 
     // 添加x轴和y轴的显示
     svg.append("g")
@@ -99,8 +106,32 @@
     console.log('刻度长度',tick_length)
     var barWidth = w/tick_length-1;
 
+    var drag = d3.behavior.drag()
+            .origin(function(d){
+                var t = d3.select(this);
+                return {
+                    x: t.attr("dx"),
+                    y: t.attr("dy")
+                };
+            })
+            .on('dragstart',function(d){
+
+            })
+            .on('dragend',function(d){
+
+            }).on('drag',function(){
+                console.log(d3.event.x)
+                d3.select(this).attr('transform','translate('+d3.event.x+',0)')
+            });
+
+    var panel = svg.append('g')
+            .attr("width",w)
+            .attr("height",h)
+            .attr("transform","translate("+padding+","+padding+")")
+            .call(drag);
+
     // 添加bar
-    svg.selectAll('.bar')
+    panel.selectAll('.bar')
             .data(datasets)
             .enter()
             .append('rect')
@@ -108,11 +139,11 @@
             .attr('x',function(d,i){
                 var local_date = new Date(d.date).setHours(0,0)
                 console.log(xScale(local_date))
-                return xScale(local_date)+padding-barWidth/2;
+                return xScale(local_date)-barWidth/2;
             })
             .attr('y',function(d){
-                console.log('Y轴坐标',h - yScale(d.sales)+padding)
-                return yScale(d.sales)+padding;
+                console.log('Y轴坐标',h - yScale(d.sales))
+                return yScale(d.sales);
             })
             .attr('width', function(d,i){
                 return barWidth;
@@ -125,15 +156,14 @@
                 return colors[i]
             })
             .on('mouseover',function(d){
-                console.log(d3.select(this))
-                var point_x = d3.select(this).attr('x');
-                var point_y = d3.select(this).attr('y');
+                var point_x = parseFloat(d3.select(this).attr('x'));
+                var point_y = parseFloat(d3.select(this).attr('y'));
                 svg.append('line')
                         .attr('id','horizontal-line')
                         .attr('x1',padding)
-                        .attr('x2',point_x)
-                        .attr('y1',point_y)
-                        .attr('y2',point_y)
+                        .attr('x2',point_x+padding)
+                        .attr('y1',point_y+padding)
+                        .attr('y2',point_y+padding)
             })
             .on('mouseout',function(){
                 d3.select('#horizontal-line').remove();
@@ -152,8 +182,6 @@
             })
             .text(function(d){return d.sales+'件'})
 
-
-
     // 添加x轴的维度标注
     svg.append("text")
             .attr('class','axis-label')
@@ -168,10 +196,129 @@
             .text('销量')
 
 
-    function zoomed(){
-        var scale = d3.event.scale;
-        var translate = d3.event.translate;
-        console.log('scale:'+scale,'translate:'+translate)
+    // 绘图的核心函数
+    function drawChart(start, end, datasets){
+        /*
+        * start 开始时间,格式为时间对象
+        * end 结束时间,格式为时间对象
+        * datasets 数据源
+        */
+
+        // 创建画布
+        var svg = d3.select('#timeline')
+                .append('svg')
+                .attr('width', w + 2*padding)
+                .attr('height', h + 2*padding);
+
+        // 创建x轴比例尺,以时间为刻度
+        var xScale = d3.time.scale()
+                .domain([start,end])
+                .range([0,w]);
+
+        // 创建y轴比例尺，线性的刻度
+        var yScale = d3.scale.linear()
+                .domain([0,d3.max(datasets,function(d){return d.sales})])
+                .range([h,0]);
+
+        // 创建x轴坐标
+        var xAxis = d3.svg.axis()
+                .scale(xScale)
+                .orient('bottom')
+                .ticks(d3.time.day, 1)
+                .tickSize(10)
+                .tickFormat(d3.time.format('%m-%d'));
+
+        // 创建y轴坐标
+        var yAxis = d3.svg.axis()
+                .scale(yScale)
+                .orient('left');
+
+        // 绘制x轴
+        svg.append('g')
+                .attr('class','x axis')
+                .attr('transform','translate('+padding+','+(h+padding)+')')
+                .call(xAxis);
+
+        // 绘制y轴
+        svg.append('g')
+                .attr('class','y axis')
+                .attr('transform','translate('+padding+','+padding+')')
+                .call(yAxis);
+
+        // 绘制panel
+        var panel = svg.append('g')
+                .attr('width',w)
+                .attr('height',h)
+                .attr('class','panel');
+
+        // 过滤元数据的
+        var data_list = []
+        datasets.forEach(function(item){
+            if (item['date'] > start_time && item['date'] < end_time){
+                data_list.push(item)
+            }
+        });
+
+        // 添加数据组
+        panel.selectAll('.group')
+                .data(data_list)
+                .enter()
+                .append('g')
+                .attr('class','group')
+                .attr('width',10)
+                .attr('height',10)
+                .attr('x', function(d){
+                    return xScale(d.date)
+                })
+                .attr('y', function(d){
+                    return yScale(d.sales)
+                })
+
+        var groups =  panel.selectAll('.group');
+        
+        panel.selectAll('.bar')
+                .data(data_list)
+                .enter()
+                .append('rect')
+                .attr('class','bar')
+                .attr('x',function(d,i){
+                    var local_date = new Date(d.date).setHours(0,0)
+                    console.log(xScale(local_date))
+                    return xScale(local_date)+padding-barWidth/2;
+                })
+                .attr('y',function(d){
+                    console.log('Y轴坐标',h - yScale(d.sales))
+                    return yScale(d.sales)+padding;
+                })
+                .attr('width', function(d,i){
+                    return barWidth;
+                })
+                .attr('height', function(d){
+                    console.log(yScale(d.sales))
+                    return h-yScale(d.sales)
+                })
+                .attr('fill',function(d,i){
+                    return colors[i]
+                })
+
+
+//        group.append('.bar')
+//                .attr('class','bar')
+//                .attr('x', function(d){
+//                    return xScale(d)+15
+//                })
+//                .attr('y', function(d){
+//                    return yScale(d.sales)
+//                })
     }
+
+    // 调用绘制函数
+    var start_time = new Date(2017,07,01);
+    var end_time = new Date(2017,07,15);
+
+    // 开始绘图
+    drawChart(start_time, end_time, datasets);
+
+
 
 </script>
