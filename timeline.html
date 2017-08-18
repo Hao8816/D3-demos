@@ -65,137 +65,6 @@
         {'date': new Date(2017,07,31),'sales': 200}
     ];
 
-    var start = new Date(2017,06,31);
-    var end = new Date(2017,07,22);
-
-    var xScale = d3.time.scale()
-            .domain([start,end])
-            .range([0,w])
-
-    var yScale = d3.scale.linear()
-            .domain([0,d3.max(datasets,function(d){return d.sales})])
-            .range([h,0]);
-
-    var xAxis = d3.svg.axis()
-            .scale(xScale)
-            .orient("bottom")
-            .ticks(d3.time.day, 1)
-            .tickSize(10)
-            .tickFormat(d3.time.format('%m-%d'))
-
-    var yAxis = d3.svg.axis()
-            .scale(yScale)
-            .orient("left")
-
-    var svg = d3.select('svg')
-            .attr('width',w+2*padding)
-            .attr('height',h+2*padding);
-
-    // 添加x轴和y轴的显示
-    svg.append("g")
-            .attr("class", "y axis")
-            .attr("transform", "translate("+padding+", "+padding+")")
-            .call(yAxis);
-
-    svg.append("g")
-            .attr("class", "x axis")
-            .attr("transform", "translate("+padding+", " + (h+padding)+ ")")
-            .call(xAxis);
-
-    var tick_length = d3.selectAll('.x.axis .tick')[0].length
-    console.log('刻度长度',tick_length)
-    var barWidth = w/tick_length-1;
-
-    var drag = d3.behavior.drag()
-            .origin(function(d){
-                var t = d3.select(this);
-                return {
-                    x: t.attr("dx"),
-                    y: t.attr("dy")
-                };
-            })
-            .on('dragstart',function(d){
-
-            })
-            .on('dragend',function(d){
-
-            }).on('drag',function(){
-                console.log(d3.event.x)
-                d3.select(this).attr('transform','translate('+d3.event.x+',0)')
-            });
-
-    var panel = svg.append('g')
-            .attr("width",w)
-            .attr("height",h)
-            .attr("transform","translate("+padding+","+padding+")")
-            .call(drag);
-
-    // 添加bar
-    panel.selectAll('.bar')
-            .data(datasets)
-            .enter()
-            .append('rect')
-            .attr('class','bar')
-            .attr('x',function(d,i){
-                var local_date = new Date(d.date).setHours(0,0)
-                console.log(xScale(local_date))
-                return xScale(local_date)-barWidth/2;
-            })
-            .attr('y',function(d){
-                console.log('Y轴坐标',h - yScale(d.sales))
-                return yScale(d.sales);
-            })
-            .attr('width', function(d,i){
-                return barWidth;
-            })
-            .attr('height', function(d){
-                console.log(yScale(d.sales))
-                return h-yScale(d.sales)
-            })
-            .attr('fill',function(d,i){
-                return colors[i]
-            })
-            .on('mouseover',function(d){
-                var point_x = parseFloat(d3.select(this).attr('x'));
-                var point_y = parseFloat(d3.select(this).attr('y'));
-                svg.append('line')
-                        .attr('id','horizontal-line')
-                        .attr('x1',padding)
-                        .attr('x2',point_x+padding)
-                        .attr('y1',point_y+padding)
-                        .attr('y2',point_y+padding)
-            })
-            .on('mouseout',function(){
-                d3.select('#horizontal-line').remove();
-            })
-
-    svg.selectAll('.label')
-            .data(datasets)
-            .enter()
-            .append('text')
-            .attr('class','label')
-            .attr('x',function(d){
-                return xScale(new Date(d.date))+15
-            })
-            .attr('y',function(d){
-                return yScale(d.sales)+padding-5;
-            })
-            .text(function(d){return d.sales+'件'})
-
-    // 添加x轴的维度标注
-    svg.append("text")
-            .attr('class','axis-label')
-            .attr('x',w+padding+5)
-            .attr('y',h+padding)
-            .text('时间轴')
-
-    svg.append("text")
-            .attr('class','axis-label')
-            .attr('x',padding-10)
-            .attr('y',padding-10)
-            .text('销量')
-
-
     // 绘图的核心函数
     function drawChart(start, end, datasets){
         /*
@@ -245,11 +114,16 @@
                 .attr('transform','translate('+padding+','+padding+')')
                 .call(yAxis);
 
+        var tick_length = d3.selectAll('.x.axis .tick')[0].length
+        console.log('刻度长度',tick_length)
+        var barWidth = w/tick_length-1;
+
         // 绘制panel
         var panel = svg.append('g')
                 .attr('width',w)
                 .attr('height',h)
-                .attr('class','panel');
+                .attr('class','panel')
+                .call(drag);
 
         // 过滤元数据的
         var data_list = []
@@ -260,26 +134,14 @@
         });
 
         // 添加数据组
-        panel.selectAll('.group')
+        var groups = panel.selectAll('.group')
                 .data(data_list)
                 .enter()
                 .append('g')
-                .attr('class','group')
-                .attr('width',10)
-                .attr('height',10)
-                .attr('x', function(d){
-                    return xScale(d.date)
-                })
-                .attr('y', function(d){
-                    return yScale(d.sales)
-                })
+                .attr('class','group');
 
-        var groups =  panel.selectAll('.group');
-        
-        panel.selectAll('.bar')
-                .data(data_list)
-                .enter()
-                .append('rect')
+        // 添加bar的信息
+        groups.append('rect')
                 .attr('class','bar')
                 .attr('x',function(d,i){
                     var local_date = new Date(d.date).setHours(0,0)
@@ -300,21 +162,91 @@
                 .attr('fill',function(d,i){
                     return colors[i]
                 })
+                .on('mouseover', function(d){
+                    var point_x = parseFloat(d3.select(this).attr('x'));
+                    var point_y = parseFloat(d3.select(this).attr('y'));
+                    svg.append('line')
+                            .attr('id','horizontal-line')
+                            .attr('x1',padding)
+                            .attr('x2',point_x)
+                            .attr('y1',point_y)
+                            .attr('y2',point_y)
+                })
+                .on('mouseout', function(d){
+                    d3.select('#horizontal-line').remove();
+                });
 
+        // 添加label
+        groups.append('text')
+                .attr('class','label')
+                .attr('x', function(d){
+                    var local_date = new Date(d.date).setHours(0,0)
+                    console.log(xScale(local_date))
+                    return xScale(local_date)+padding-barWidth/2;
+                })
+                .attr('y',function(d){
+                    console.log('Y轴坐标',h - yScale(d.sales))
+                    return yScale(d.sales)+padding-5;
+                })
+                .text(function(d){
+                    return d.sales+'件';
+                })
+                .attr('textLength',barWidth)
+                .attr('lengthAdjust','spacing');
 
-//        group.append('.bar')
-//                .attr('class','bar')
-//                .attr('x', function(d){
-//                    return xScale(d)+15
-//                })
-//                .attr('y', function(d){
-//                    return yScale(d.sales)
-//                })
+        // 添加x轴的维度标注
+        svg.append("text")
+                .attr('class','axis-label')
+                .attr('x',w+padding+5)
+                .attr('y',h+padding)
+                .text('时间轴');
+
+        // 添加y轴的维度标注
+        svg.append("text")
+                .attr('class','axis-label')
+                .attr('x',padding-10)
+                .attr('y',padding-20)
+                .text('销量');
     }
 
     // 调用绘制函数
     var start_time = new Date(2017,07,01);
     var end_time = new Date(2017,07,15);
+    // 初始化拖拽事件
+    var offset_x = 0;
+
+    // 按照时间的总长度和x轴的长度，求出每单位时间的长度
+    var time_range = end_time.getTime() - start_time.getTime();
+    var range_length = time_range/w;
+
+    var drag = d3.behavior.drag()
+            .origin(function(d){
+                var t = d3.select(this);
+                return {
+                    x: t.attr("dx"),
+                    y: t.attr("dy")
+                };
+            })
+            .on('dragstart',function(d){
+
+            })
+            .on('dragend',function(d){
+                // 计算拖拽的距离产生的事件
+                var timestamp = Math.abs(offset_x)*range_length;
+                start_time = start_time.getTime()+parseFloat(timestamp);
+                end_time = end_time.getTime()+parseFloat(timestamp);
+                console.log('开始时间',new Date(start_time))
+                console.log('结束时间',new Date(end_time))
+
+                // 重新渲染
+                drawChart(new Date(start_time),new Date(end_time), datasets)
+
+            }).on('drag',function(){
+                console.log(d3.event.x)
+                d3.select(this).attr('transform','translate('+d3.event.x+',0)')
+                offset_x = d3.event.x+offset_x;
+            });
+
 
     // 开始绘图
     drawChart(start_time, end_time, datasets);
