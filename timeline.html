@@ -150,7 +150,8 @@
             }).on('drag',function(){
                 console.log('xxxx',d3.event.x)
                 // 被拖动的对象移动
-//                d3.select(this).attr('transform','translate('+d3.event.x+',0)')
+                d3.select(this).attr('x',d3.event.x);
+                d3.select(this).attr('y',0);
                 // x 轴跟着一起动
 //                svg.select('.x.axis').attr('transform','translate('+(d3.event.x+padding)+','+(h+padding)+')');
                 // 动态改变x的domain
@@ -171,7 +172,7 @@
     var panel = svg.append('g')
             .attr('width',w)
             .attr('height',h)
-            .attr('class','panel')
+            .attr('class','panel').call(drag);
 
 
     // 添加数据组
@@ -216,7 +217,7 @@
             })
             .on('mouseout', function(d){
                 d3.select('#horizontal-line').remove();
-            }).call(drag);;
+            });
 
     // 添加label
     groups.append('text')
