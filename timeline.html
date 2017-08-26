@@ -69,7 +69,7 @@
     var min_time = d3.min(datasets,function(d){return d.date})
     var max_time = d3.max(datasets,function(d){return d.date})
     var start_time = new Date(2017,07,01);
-    var end_time = new Date(2017,07,15);
+    var end_time = new Date(start_time.getTime()+15*24*60*60*1000);
 
     // 创建画布
     var svg = d3.select('#timeline')
@@ -233,6 +233,9 @@
         // 过滤元数据的
         var data_list = []
         datasets.forEach(function(item){
+            console.log('数据时间',item['date'])
+            console.log('开始时间',start_time)
+            console.log('结束时间',end_time)
             if (item['date'] > start_time && item['date'] < end_time){
                 data_list.push(item)
             }
@@ -261,9 +264,11 @@
         var groups = panel.selectAll('.group')
                 .data(data_list);
 
-        groups.enter().append('g').attr('class','group');
-
         groups.exit().remove();
+
+        groups.enter().append('g').attr('class','group').append('rect').attr('class','bar').attr('fill',function(d,i){
+            return colors[0];
+        });
 
         // 添加bar的信息
         groups.select('.bar')
