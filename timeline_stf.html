@@ -127,11 +127,7 @@
             .attr('transform','translate('+padding+','+padding+')')
             .call(yAxis);
 
-//    var tick_length = d3.selectAll('.x.axis .tick')[0].length
-//    console.log('刻度长度',tick_length)
-//    var barWidth = w/tick_length-1;
-
-    var barWidth = 20;
+    var barWidth = 30;
 
     var flag = true;
     var drag = d3.behavior.drag()
@@ -150,11 +146,9 @@
                 // 按照时间的总长度和x轴的长度，求出每单位时间的长度
                 var time_range = max_time.getTime() - min_time.getTime();
                 var range_length = time_range/w;
-                console.log('ssdsds',range_length)
                 var timestamp = (d3.event.x)*range_length;
                 var start = start_time.getTime()-parseFloat(timestamp);
                 var end= end_time.getTime()-parseFloat(timestamp);
-                console.log('拖拽后的时间',new Date(end))
                 // 判断时间的范围
                 if (start>min_time.getTime()-24*60*60*1000 && end <max_time.getTime()+24*60*60*1000){
                     if(flag){
@@ -195,7 +189,6 @@
                 return barWidth;
             })
             .attr('height', function(d){
-                console.log(yScale(d.sales))
                 return h-yScale(d.sales)
             })
             .attr('fill',function(d,i){
@@ -220,7 +213,6 @@
             .attr('class','label')
             .attr('x', function(d){
                 var local_date = new Date(d.date).setHours(0,0)
-                console.log(xScale(local_date))
                 return xScale(local_date)+padding-barWidth/2;
             })
             .attr('y',function(d){
@@ -300,9 +292,6 @@
                 .orient('left');
         svg.select('.y.axis').call(yAxis);
 
-        console.log(data_list);
-
-
         var panel =  svg.select('.panel');
 
         // 添加数据组
@@ -311,9 +300,11 @@
 
         groups.exit().remove();
 
-        groups.enter().append('g').attr('class','group').append('rect').attr('class','bar').attr('fill',function(d,i){
+        var new_groups = groups.enter().append('g').attr('class','group');
+        new_groups.append('rect').attr('class','bar').attr('fill',function(d,i){
             return colors[0];
-        }).append('text').attr('class','label');
+        });
+        new_groups.append('text').attr('class','label');
 
         // 添加bar的信息
         groups.select('.bar')
@@ -328,7 +319,6 @@
                     return barWidth;
                 })
                 .attr('height', function(d){
-                    console.log(yScale(d.sales))
                     return h-yScale(d.sales)
                 })
                 .on('mouseover', function(d){
@@ -363,7 +353,6 @@
 
     d3.select('#change_type').on('change',function(){
         var type = d3.select(this).node().value;
-        console.log(type)
         var min;
         var max;
         var data;
