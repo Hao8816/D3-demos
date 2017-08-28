@@ -33,6 +33,9 @@
     .axis-label{
         font-size: 12px;
     }
+    .drag{
+        cursor: move;
+    }
 </style>
 <h4>页面功能</h4>
 <p>
@@ -57,34 +60,19 @@
     var padding = 40;
     var x_conf;
     var start_time;
-    var end_time;
     var min_time;
     var max_time;
     var datasets = [];
-    var range_step;
 
-    var colors = d3.range(100).map(d3.scale.category20())
+    var colors = d3.range(100).map(d3.scale.category20());
 
-//    var datasets = [
-//        {'date': new Date(2017,07,01),'sales': 100},
-//        {'date': new Date(2017,07,02),'sales': 400},
-//        {'date': new Date(2017,07,03),'sales': 200},
-//        {'date': new Date(2017,07,04),'sales': 700},
-//        {'date': new Date(2017,07,10),'sales': 900},
-//        {'date': new Date(2017,07,15),'sales': 450},
-//        {'date': new Date(2017,07,18),'sales': 600},
-//        {'date': new Date(2017,07,20),'sales': 600},
-//        {'date': new Date(2017,07,22),'sales': 800},
-//        {'date': new Date(2017,07,25),'sales': 500},
-//        {'date': new Date(2017,07,27),'sales': 400},
-//        {'date': new Date(2017,07,31),'sales': 200}
-//    ];
-//
-//    // 调用绘制函数
-//    var min_time = d3.min(datasets,function(d){return d.date})
-//    var max_time = d3.max(datasets,function(d){return d.date})
-//    var start_time = new Date(2017,07,01);
-//    var end_time = new Date(start_time.getTime()+15*24*60*60*1000);
+    // 通过开始时间和x_conf获取结束时间
+    function getEndTime(start){
+        if (start){
+            var end = new Date(start.getTime()+x_conf['range']);
+            return end;
+        }
+    }
 
     // 创建画布
     var svg = d3.select('#timeline')
@@ -94,7 +82,7 @@
 
     // 创建x轴比例尺,以时间为刻度
     var xScale = d3.time.scale()
-            .domain([start_time,end_time])
+            .domain([start_time, getEndTime(start_time)])
             .range([0,w]);
 
     // 创建y轴比例尺，线性的刻度
@@ -129,7 +117,29 @@
 
     var barWidth = 30;
 
-    var flag = true;
+    var all_offset = 0;   // 总体位移
+    var single_offset = 0;  // 单次位移
+
+    // 计算当前的偏移总值有没有越界(通过输入偏移量，返回本屏开始和结束的时间)
+    function getTimeRange(){
+        var range = max_time.getTime() - min_time.getTime();
+        var range_length = range/w;
+        var timestamp = parseFloat(all_offset)*range_length;
+        var start = min_time.getTime()-parseFloat(timestamp);
+        var end= getEndTime(min_time).getTime()-parseFloat(timestamp);
+
+        // 监测时间的边界
+        var range = {
+            'start' : start,
+            'end' : end,
+            'min' : '',
+            'max' : ''
+        };
+
+        return range;
+    }
+
+
     var drag = d3.behavior.drag()
             .origin(function(d){
                 var t = d3.select(this);
@@ -138,35 +148,27 @@
                     y: t.attr("y")
                 };
             })
+            .on('dragend',function(){
+                // 按照时间的总长度和x轴的长度，求出每单位时间的长度
+                all_offset = all_offset + single_offset;
+                var range = getTimeRange();
+                // 更新图表
+                updateTimeLine(new Date(range['start']),new Date(range['end']));
+            })
             .on('drag',function(){
                 // 被拖动的对象移动
+                console.log('正在拖动',d3.event.x)
                 d3.select(this).attr('x',d3.event.x);
                 d3.select(this).attr('y',0);
-
-                // 按照时间的总长度和x轴的长度，求出每单位时间的长度
-                var time_range = max_time.getTime() - min_time.getTime();
-                var range_length = time_range/w;
-                var timestamp = (d3.event.x)*range_length;
-                var start = start_time.getTime()-parseFloat(timestamp);
-                var end= end_time.getTime()-parseFloat(timestamp);
-                // 判断时间的范围
-                if (start>min_time.getTime()-24*60*60*1000 && end <max_time.getTime()+24*60*60*1000){
-                    if(flag){
-                        // 更新图表
-                        updateTimeLine(new Date(start),new Date(end));
-                        flag = false;
-                        setTimeout('flag = true',100);
-                    }else{
-                        console.log('点击事件不执行');
-                    }
-                }
+                single_offset = parseFloat(d3.event.x);
+                d3.select('.panel').attr('transform','translate('+(parseFloat(d3.event.x))+',0)')
             });
 
     // 绘制panel
     var panel = svg.append('g')
             .attr('width',w)
             .attr('height',h)
-            .attr('class','panel').call(drag);
+            .attr('class','panel');
 
     // 添加数据组
     var groups = panel.selectAll('.group')
@@ -239,19 +241,29 @@
             .text('销量');
 
 
-    // 刻度类型，数据源，最大最小时间 三个变量都会发生变化的时候
+    // 添加拖拽的表面层
+    svg.append('rect')
+            .attr('width',w)
+            .attr('height',h)
+            .attr('class','drag')
+            .attr('fill','#dddddd')
+            .attr('fill-opacity',0)
+            .attr('transform','translate('+padding+','+padding+')')
+            .call(drag);
 
-    var DATA_TYPES = {
-        '0' : {'type': d3.time.hours, 'format': '%H:%M'},
-        '1' : {'type': d3.time.day, 'format': '%m-%d'},
-        '2' : {'type': d3.time.month, 'format': '%Y-%m'}
-    };
 
     // 时间常量
     var HOUR_MS = 1000*60*60;
     var DAY_MS = HOUR_MS*24;
     var MONTH_MS = DAY_MS*30;
     var YEAR_MS = MONTH_MS*12;
+
+    // 刻度类型，数据源，最大最小时间 三个变量都会发生变化的时候
+    var DATA_TYPES = {
+        '0' : {'type': d3.time.hours, 'format': '%H:%M','range': DAY_MS},
+        '1' : {'type': d3.time.day, 'format': '%m-%d', 'range': MONTH_MS},
+        '2' : {'type': d3.time.month, 'format': '%Y-%m', 'range' : YEAR_MS}
+    };
 
     // 绘图的核心函数
     function updateTimeLine(start, end){
@@ -292,7 +304,8 @@
                 .orient('left');
         svg.select('.y.axis').call(yAxis);
 
-        var panel =  svg.select('.panel');
+        var panel =  svg.select('.panel')
+                .attr('transform','translate(0,0)');
 
         // 添加数据组
         var groups = panel.selectAll('.group')
@@ -349,6 +362,11 @@
                 })
                 .attr('textLength',barWidth)
                 .attr('lengthAdjust','spacing');
+
+        d3.select('.drag')
+                .attr('transform','translate('+padding+','+padding+')')
+                .attr('x',0)
+                .attr('y',0);
     }
 
     d3.select('#change_type').on('change',function(){
@@ -404,31 +422,20 @@
             ];
         }
 
-        var start = min;
-        var end = max;
         // 根据type确定X轴的刻度，间隔等
         x_conf = DATA_TYPES[type];
-        switch (parseInt(type)){
-            case 0 :
-                end = new Date(start.getTime()+DAY_MS);
-                break;
-            case 1 :
-                end = new Date(start.getTime()+MONTH_MS);
-                break;
-            case 2 :
-                end = new Date(start.getTime()+YEAR_MS);
-                break;
-        }
 
         // 更新最大最小时间
         min_time = min;
         max_time = max;
+
         datasets = data;
-        start_time = start;
-        end_time = end;
+        start_time = min;
+
+        var end = new Date(min.getTime()+x_conf['range']);
 
         // 更新数据
-        updateTimeLine(start, end);
+        updateTimeLine(min, end);
     })
 
 
