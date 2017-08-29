@@ -73,6 +73,14 @@
             return end;
         }
     }
+    // 获取结束时间
+    function getStartTime(end){
+        if (end){
+            var start = new Date(end.getTime()-x_conf['range']);
+            return start;
+        }
+    }
+
 
     // 创建画布
     var svg = d3.select('#timeline')
@@ -123,30 +131,39 @@
     // 计算当前的偏移总值有没有越界(通过输入偏移量，返回本屏开始和结束的时间)
     function getTimeRange(){
         var range = max_time.getTime() - min_time.getTime();
+        var pre_range = x_conf['range'];
+        var max_offset = range/pre_range*w-w;
+
         var range_length = range/w;
         var timestamp = parseFloat(all_offset)*range_length;
-        var start = min_time.getTime()-parseFloat(timestamp);
-        var end= getEndTime(min_time).getTime()-parseFloat(timestamp);
 
-        if (start<min_time.getTime()){
-            start = min_time.getTime()
-            end = getEndTime(new Date(start)).getTime()-parseFloat(timestamp)
-        }else if (end>max_time.getTime()){
-            start = max_time.getTime()+parseFloat(timestamp)
+        console.log('最大距离',max_offset)
+        console.log('目前偏移',all_offset)
+
+        var start;
+        var end;
+        if (all_offset<-max_offset){
             end = max_time.getTime()
+            start = getStartTime(new Date(end)).getTime()
+        }else if(all_offset>max_offset){
+            start = min_time.getTime()
+            end = getEndTime(new Date(start)).getTime()
+        }else{
+            start = min_time.getTime()-parseFloat(timestamp);
+            end = getEndTime(min_time).getTime()-parseFloat(timestamp);
         }
 
         // 监测时间的边界
         var range = {
             'start' : start,
             'end' : end,
-            'min' : '',
-            'max' : ''
+            'min' : -max_offset,
+            'max' : max_offset
         };
         return range;
     }
 
-
+    // 定义拖拽函数
     var drag = d3.behavior.drag()
             .origin(function(d){
                 var t = d3.select(this);
@@ -192,7 +209,7 @@
     groups.append('rect')
             .attr('class','bar')
             .attr('x',function(d,i){
-                var local_date = new Date(d.date).setHours(0,0);
+                var local_date = new Date(d.date);
                 return xScale(local_date)+padding-barWidth/2;
             })
             .attr('y',function(d){
@@ -225,7 +242,7 @@
     groups.append('text')
             .attr('class','label')
             .attr('x', function(d){
-                var local_date = new Date(d.date).setHours(0,0)
+                var local_date = new Date(d.date);
                 return xScale(local_date)+padding-barWidth/2;
             })
             .attr('y',function(d){
@@ -333,7 +350,7 @@
         // 添加bar的信息
         groups.select('.bar')
                 .attr('x',function(d,i){
-                    var local_date = new Date(d.date).setHours(0,0);
+                    var local_date = new Date(d.date);
                     return xScale(local_date)+padding-barWidth/2;
                 })
                 .attr('y',function(d){
@@ -362,7 +379,7 @@
         // 添加label
         groups.select('.label')
                 .attr('x', function(d){
-                    var local_date = new Date(d.date).setHours(0,0)
+                    var local_date = new Date(d.date);
                     return xScale(local_date)+padding-barWidth/2;
                 })
                 .attr('y',function(d){
