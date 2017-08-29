@@ -148,10 +148,14 @@
                     y: t.attr("y")
                 };
             })
+            .on('dragstart',function(){
+                single_offset = 0;
+            })
             .on('dragend',function(){
                 // 按照时间的总长度和x轴的长度，求出每单位时间的长度
                 all_offset = all_offset + single_offset;
                 var range = getTimeRange();
+                console.log(range);
                 // 更新图表
                 updateTimeLine(new Date(range['start']),new Date(range['end']));
             })
