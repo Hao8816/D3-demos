@@ -128,6 +128,14 @@
         var start = min_time.getTime()-parseFloat(timestamp);
         var end= getEndTime(min_time).getTime()-parseFloat(timestamp);
 
+        if (start<min_time.getTime()){
+            start = min_time.getTime()
+            end = getEndTime(new Date(start)).getTime()-parseFloat(timestamp)
+        }else if (end>max_time.getTime()){
+            start = max_time.getTime()+parseFloat(timestamp)
+            end = max_time.getTime()
+        }
+
         // 监测时间的边界
         var range = {
             'start' : start,
@@ -135,7 +143,6 @@
             'min' : '',
             'max' : ''
         };
-
         return range;
     }
 
