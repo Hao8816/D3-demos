@@ -190,6 +190,18 @@
                 d3.select(this).attr('y',0);
                 single_offset = parseFloat(d3.event.x);
                 d3.select('.panel').attr('transform','translate('+(parseFloat(d3.event.x))+',0)')
+
+                // 判断所有bar的坐标，是不是大于移动的距离
+                d3.selectAll('.group').attr('fill-opacity',function(d,i){
+                    var point_x = d3.select(this).select('.bar').attr('x');
+                    console.log('xxxx',point_x)
+                    console.log('yyyy',Math.abs(single_offset))
+                    if (parseFloat(point_x)<Math.abs(single_offset-40) || parseFloat(point_x)+Math.abs(single_offset)>w){
+                        return 0;
+                    }else{
+                        return 1;
+                    }
+                })
             });
 
     // 绘制panel
