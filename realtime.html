@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+    .axis path,
+    .axis line{
+        fill: none;
+        stroke: black;
+        shape-rendering: crispEdges;
+    }
+    .axis text{
+        font-size: 10px;
+        /*stroke: #333;*/
+        font-weight: 100;
+        font-family: "微软雅黑";
+        /*transform:rotate(90deg);*/
+    }
+    #tooltip{
+        color: #000;
+        font-size: 12px;
+    }
+    .label{
+        font-size: 12px;
+    }
+    .bar{
+        cursor: pointer;
+    }
+
+    #horizontal-line{
+        stroke : #999999;
+        stroke-width: 1;
+        stroke-dasharray:  5;
+    }
+    .axis-label{
+        font-size: 12px;
+    }
+    .drag{
+        cursor: move;
+    }
+</style>
+<h4>页面功能</h4>
+<button onclick="startRecord()">开始</button>
+<button onclick="stopRecord()">结束</button>
+<div id="cup">
+
+</div>
+<div id="memory">
+
+</div>
+
+
+<svg width="960" height="1060"></svg>
+<script src="d3.v3.min.js"></script>
+<script>
+    // 实现思路
+    var cpu_message = [];
+    var memory_message = [];
+    var record_timer;
+    var input_timer;
+
+    // 存储消息S产生消息
+    function startRecord(){
+        record_timer = setInterval(function(){
+            var time = new Date();
+            var cpu_value = Math.floor(Math.random()*10);;
+            var memory_value = Math.floor(Math.random()*10);;
+            cpu_message.push({'time':time, 'value':cpu_value});
+            memory_message.push({'time':time, 'value':memory_value});
+
+        },1000);
+
+        // 动态取数据，渲染对应的图
+        input_timer = setInterval(function(){
+            // 分别取出数字渲染
+            renderChart('cup',cpu_message.pop())
+            renderChart('memory',memory_message.pop())
+
+        },1000);
+    }
+
+    // 停止产生消息
+    function stopRecord(){
+        clearInterval(record_timer);
+        clearInterval(input_timer);
+    }
+
+    // 渲染图表
+    function renderChart(chart, dataset){
+        console.log(chart,dataset);
+    }
+
+</script>
