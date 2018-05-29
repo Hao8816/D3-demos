@@ -132,9 +132,9 @@
         var path = svg.select('.line_path')
                 .attr("d", line(dataset));
 
-        d3.select('.min_label_value').text(d3.min(dataset,function(d){return d.value}));
-        d3.select('.max_label_value').text(d3.max(dataset,function(d){return d.value}));
-        d3.select('.avg_label_value').text(d3.sum(dataset,function(d){return d.value})/dataset.length);
+        d3.select('#'+chart_id).select('.min_label_value').text(d3.min(dataset,function(d){return d.value}));
+        d3.select('#'+chart_id).select('.max_label_value').text(d3.max(dataset,function(d){return d.value}));
+        d3.select('#'+chart_id).select('.avg_label_value').text(d3.sum(dataset,function(d){return d.value})/dataset.length);
     }
 
     var w = 500;
