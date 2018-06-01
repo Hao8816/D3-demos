@@ -6,4 +6,4 @@
 
 
 # 时间轴
-[timeline_stf.html](http://www.tihub.cn/d3/timeline_stf.html) 简单效果2.
+[drag_timeline.html](http://www.tihub.cn/d3/drag_timeline.html) 简单效果2.
