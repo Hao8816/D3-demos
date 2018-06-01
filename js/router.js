@@ -10,8 +10,12 @@ var app = angular.module('vis' , ['ngRoute']).run(function() {
 app.config(['$routeProvider', function ($routeProvider) {
     $routeProvider.
         when('/index/', {
-            templateUrl: 'views/timeline.html',
+            templateUrl: 'views/visualization/timeline.html',
             controller: 'timelinePageController'
+        }).
+        when('/vis/category/', {
+            templateUrl: 'views/visualization/category.html',
+            controller: 'visCategoryPageController'
         }).
 
         otherwise({redirectTo: '/index/'});
@@ -69,3 +73,14 @@ app.controller(
 
     }
 );
+
+
+app.controller(
+    'visCategoryPageController',
+    function visCategoryPageController($scope, $http, $routeParams, $location, $rootScope) {
+        $rootScope.page_name = "用户登录";
+
+
+    }
+);
+
