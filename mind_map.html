@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang=zh>
+<meta charset=utf-8>
+<meta content="width=device-width,initial-scale=1" name=viewport>
+<title>Mind Map | 十二月咖啡馆工作室</title>
+<meta content=动画,html5,javascript name=keywords>
+<meta content="" name=description>
+<!--<link href=favcion.ico rel=icon sizes=32x32>-->
+<!--<link href=./css/normalize.css rel=stylesheet>-->
+<!--<link href=./css/dc.css rel=stylesheet>-->
+<div class=container>
+<div class=showcase>
+    <svg height=600 id=mindmap-svg width=1300>
+</div>
+<script src='jquery-1.12.4.min.js'></script>
+<script src=https://d3js.org/d3.v4.js></script>
+<script>
+function MindMap() {
+
+    // 初始化变量
+    var svg, width, height, dataset, nodes, links, tree, root, gmind, glink, gnode, node_id = 0, link_id = 0;
+
+    var colors = ['#faa01b', '#18968f', '#ea726a', '#ddd'];
+
+    // 渲染图表
+    function renderChart() {
+        init_chart();
+        render_data([0, 0]);
+//        e();
+    }
+
+    // 初始化画布
+    function init_chart() {
+        // 定义树形结构
+        tree = d3.tree().size([360, 120]).separation(function (targer, source) {
+            return (targer.parent == source.parent ? 1 : 2) / targer.depth;
+        });
+
+        // 定义树形层次
+        root = d3.hierarchy(dataset);
+        root.descendants().forEach(function (node, e) {
+            node.data.closed = "true" == node.data.closed;
+            node.data.closed && clickNode(node)
+        });
+
+        // gmind 元素
+        gmind = svg.select(".gmind");
+        gmind.empty() && (gmind = svg.append("g").attr("class", "gmind"));
+
+        // glink 元素
+        glink = gmind.select(".glink");
+        glink.empty() && (glink = gmind.append("g").attr("class", "glink"));
+
+        // gnode 元素
+        gnode = gmind.select(".gnode");
+        gnode.empty() && (gnode = gmind.append("g").attr("class", "gnode"));
+
+        // 设置移动的位置
+        glink.attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+        gnode.attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+        // 画布缩放事件
+        var zoom = d3.zoom().scaleExtent([.7, 2])
+                .translateExtent([
+                    [-.7 * width, -.7 * height],
+                    [1.7 * width, 1.7 * height]
+                ])
+                .on("zoom", function () {
+                    var t = "scale(" + d3.event.transform.k + ")";
+                    var e = "translate(" + d3.event.transform.x + "," + d3.event.transform.y + ")";
+                    gmind.attr("transform", e + t)
+                });
+        svg.call(zoom)
+    }
+
+    function n(t, e) {
+        var r = (t - 90) / 180 * Math.PI
+                , n = e;
+        return [n * Math.cos(r), n * Math.sin(r)]
+    }
+
+    // 绘制节点和关系
+    function render_data(t) {
+        tree(root),
+        nodes = root.descendants();
+        links = root.links();
+        nodes.forEach(function (t) {
+            t.y = 160 * t.depth;
+            t.pos = n(t.x, t.y);
+        });
+
+        // 计算节点的id
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].id || (nodes[i].id = node_id, node_id++);
+        }
+
+        // 计算link的id
+        for (var i = 0; i < links.length; i++) {
+            links[i].id || (links[i].id = link_id, link_id++);
+        }
+
+        // 定义显示的比例尺
+        var r = d3.scaleLinear().domain([0, 180, 360]).range([1, .3, 1]);
+        var rScale = d3.scaleLinear().domain([0, 1, 2, 10]).range([25, 15, 10, 5]);
+        var node = gnode.selectAll(".node").data(nodes, function (t) {
+                    return t.id
+                });
+        var nodeEnter = node.enter();
+        var nodeExit = node.exit();
+
+        var node_wrapper = nodeEnter.append("g")
+                .attr("class", "node")
+                .attr("transform", function (e) {
+                    return "translate(" + t[0] + "," + t[1] + ")"
+                }).on("mousedown", function (t) {
+                    d3.event.defaultPrevented || (clickNode(t),
+                            render_data(t.prevPos))
+                }).on("mouseover", function (t) {
+                    d3.select(this).style("cursor", "pointer");
+                });
+
+        // 添加圆形元素
+        node_wrapper.append("circle")
+                .attr("r", 0)
+                .style("fill", function (t) {
+                    return colors[t.depth];
+                })
+                .style("stroke-width", 1)
+                .style("stroke", function (t) {
+                    return colors[t.depth];
+                })
+                .style("opacity", 0);
+
+        // 添加文字描述
+        node_wrapper.append("text")
+                .attr("dominant-baseline", "text-before-edge")
+                .attr("text-anchor", "middle")
+                .attr("font-size", 12)
+                .attr("dy", 13)
+                .text(function (d) {
+                    return d['data']['name'];
+                })
+                .style("fill-opacity", 1);
+
+        // 所有节点
+        var p = node_wrapper.merge(node)
+                .transition()
+                .duration(600)
+                .attr("transform", function (t) {
+                    return "translate(" + t.pos[0] + "," + t.pos[1] + ")"
+                });
+
+        // 动态修改圆形的半径
+        p.select("circle").attr("r", function (t) {
+            return rScale(t.depth)
+        }).style("opacity", 1);
+
+        p.select("text").attr("dy", function (t) {
+            return rScale(t.depth)
+        }).style("fill-opacity", 1);
+
+        // 添加显示动画
+        var m = nodeExit.transition().duration(600).attr("transform", function (e) {
+            return "translate(" + t[0] + "," + t[1] + ")"
+        }).remove();
+
+        // 设置圆形的属性
+        m.select("circle")
+                .style("opacity", 0)
+                .attr("r", 0);
+        m.select("text").style("fill-opacity", 1);
+
+        // 绘制link
+        var w = glink.selectAll(".link").data(links, function (t) {
+                    return t.target.id
+                })
+                , F = w.enter()
+                , z = w.exit();
+        F.append("path").attr("class", "link").attr("fill", "none").attr("stroke", "rgba(20,20,20,0.2)").attr("stroke-width", 1).attr("opacity", 0).attr("d", function (e) {
+            var r = {
+                x: t[0],
+                y: t[1]
+            };
+            return s({
+                source: r,
+                target: r
+            })
+        }).merge(w).transition().duration(600).attr("opacity", 1).attr("d", function (t) {
+            var e = {
+                        x: t.source.pos[0],
+                        y: t.source.pos[1]
+                    }
+                    , r = {
+                        x: t.target.pos[0],
+                        y: t.target.pos[1]
+                    };
+            return "M" + e.x + "," + e.y + "L" + r.x + "," + r.y
+        }),
+        z.transition().duration(600).attr("opacity", 0).attr("d", function (e) {
+            var r = {
+                        x: t[0],
+                        y: t[1]
+                    }
+                    , n = {
+                        x: t[0],
+                        y: t[1]
+                    };
+            return "M" + r.x + "," + r.y + "L" + n.x + "," + n.y
+        }).remove();
+
+        nodes.forEach(function (t) {
+            t.prevPos = [t.pos[0], t.pos[1]]
+        })
+    }
+
+    // 更新图表，咱没实现
+    function updateChart() {
+    }
+
+    function s(t) {
+        return "M" + t.source.x + "," + t.source.y + "C" + (t.source.x + t.target.x) / 2 + "," + t.source.y + " " + (t.source.x + t.target.x) / 2 + "," + t.target.y + " " + t.target.x + "," + t.target.y
+    }
+
+    // 点击管理或者展开几点
+    function clickNode(node) {
+        node.children ? (node._children = node.children,node.children = null,node.data.closed = !0) : (node.children = node._children,node._children = null,node.data.closed = !1)
+    }
+
+    // 初始化svg参数
+    this.svg = function (t) {
+        if (arguments.length < 1)
+            return svg;
+        svg = t
+    };
+
+    // 初始化数据源
+    this.data = function (t) {
+        if (arguments.length < 1)
+            return dataset;
+        dataset = t
+    };
+
+    // 初始化尺寸
+    this.size = function (t, e) {
+        if (arguments.length < 2)
+            return [width, height];
+        width = t;
+        height = e;
+    };
+
+    // 获取跟节点
+    this.getRoot = function () {
+        return root;
+    };
+
+    this.render = renderChart;
+    this.update = updateChart;
+}
+</script>
+<script>
+    $(function(){
+        var svg = d3.select("#mindmap-svg");
+        var width = svg.attr("width");
+        var height = svg.attr("height");
+        var map = new MindMap;
+        map.svg(svg),
+                map.size(width, height),
+                d3.json("graph.json", function(err, data) {
+                    if (err){
+                        throw err;
+                    }
+                    map.data(data);
+                    map.render();
+                })
+    })
+//    !function() {
+//        var svg = d3.select("#mindmap-svg");
+//        var width = svg.attr("width");
+//        var height = svg.attr("height");
+//        var map = new MindMap;
+//        map.svg(svg),
+//        map.size(width, height),
+//        d3.json("graph.json", function(err, data) {
+//            if (err){
+//                throw err;
+//            }
+//            map.data(data);
+//            map.render();
+//        })
+//    }()
+</script>
