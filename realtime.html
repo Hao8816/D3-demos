@@ -40,6 +40,7 @@
     .drag{
         cursor: move;
     }
+    .x.axis .tick line,
     .y.axis .tick line{
         fill: none;
         stroke-width: 1;
@@ -53,7 +54,7 @@
 <div id="cup"></div>
 <h3>Memory性能测试结果</h3>
 <div id="memory"></div>
-<script src="d3.v3.min.js"></script>
+<script src="lib/d3/d3.v3.min.js"></script>
 <script>
     // 实现思路
     var cpu_message = [];
@@ -67,10 +68,10 @@
             var time = new Date();
             var cpu_value = Math.floor(Math.random()*10);
             var memory_value = Math.floor(Math.random()*10);
-            if (cpu_message.length >=10){
+            if (cpu_message.length >=20){
                 cpu_message.shift()
             }
-            if (memory_message.length >=10){
+            if (memory_message.length >=20){
                 memory_message.shift()
             }
             cpu_message.push({'time':time, 'value':cpu_value});
@@ -111,7 +112,7 @@
                 .scale(xScale)
                 .orient('bottom')
                 .ticks(d3.time.seconds,1)
-                .tickSize(10)
+                .tickSize(-h,0,0)
                 .tickFormat(d3.time.format('%M:%S'));
 
         var yAxis = d3.svg.axis()
@@ -173,7 +174,7 @@
                 .scale(xScale)
                 .orient('bottom')
                 .ticks(d3.time.seconds,1)
-                .tickSize(10)
+                .tickSize(-h,0,0)
                 .tickFormat(d3.time.format('%M:%S'));
 
         var yAxis = d3.svg.axis()
@@ -202,7 +203,7 @@
                 .attr('class','line_path')
                 .attr("d", line)
                 .attr('stroke','red')
-                .attr('stroke-width',2)
+                .attr('stroke-width',1)
                 .attr('fill','none')
                 .attr('transform','translate('+margin.left+','+margin.top+')');
 
