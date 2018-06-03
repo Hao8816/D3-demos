@@ -1,0 +1,532 @@
+{"name": "中心节点", "children": [
+    {
+        "name": "节点1",
+        "children": [
+            {
+                "name": "11",
+                "children": [
+                    {
+                        "name": "1",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "2",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "3",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "4",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "5",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "6",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "7",
+                        "closed": "false"
+                    },
+
+                    {
+                        "name": "",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "",
+                        "closed": "false"
+                    }
+                ],
+                "closed": "true"
+            },
+            {
+                "name": "12",
+                "children": [
+                    {
+                        "name": "",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "",
+                        "closed": "false"
+                    }
+                ],
+                "closed": "true"
+            }
+        ],
+        "closed": "false"
+    },
+    {
+        "name": "节点2",
+        "children": [
+            {
+                "name": "",
+                "children": [
+                    {
+                        "name": "",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "",
+                        "closed": "false"
+                    }
+                ],
+                "closed": "false"
+            },
+            {
+                "name": "",
+                "children": [
+                    {
+                        "name": "",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "",
+                        "closed": "false"
+                    }
+                ],
+                "closed": "false"
+            }
+        ],
+        "closed": "true"
+    },
+    {
+        "name": "节点3",
+        "children": [
+            {
+                "name": "13",
+                "children": [
+                    {
+                        "name": "",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "",
+                        "closed": "false"
+                    }
+                ],
+                "closed": "true"
+            },
+            {
+                "name": "14",
+                "children": [
+                    {
+                        "name": "",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "",
+                        "closed": "false"
+                    }
+                ],
+                "closed": "true"
+            }
+        ],
+        "closed": "false"
+    },
+    {
+        "name": "节点4",
+        "children": [
+            {
+                "name": "15",
+                "children": [
+                    {
+                        "name": "",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "",
+                        "closed": "false"
+                    }
+                ],
+                "closed": "true"
+            },
+            {
+                "name": "16",
+                "children": [
+                    {
+                        "name": "",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "",
+                        "closed": "false"
+                    }
+                ],
+                "closed": "true"
+            }
+        ],
+        "closed": "false"
+    },
+    {
+        "name": "节点5",
+        "children": [
+            {
+                "name": "17",
+                "children": [
+                    {
+                        "name": "",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "",
+                        "closed": "false"
+                    }
+                ],
+                "closed": "true"
+            },
+            {
+                "name": "18",
+                "children": [
+                    {
+                        "name": "",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "",
+                        "closed": "false"
+                    }
+                ],
+                "closed": "true"
+            }
+        ],
+        "closed": "false"
+    },
+    {
+        "name": "节点6",
+
+        "closed": "false"
+    },
+    {
+        "name": "节点7",
+        "children": [
+            {
+                "name": "19",
+                "children": [
+                    {
+                        "name": "",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "",
+                        "closed": "false"
+                    }
+                ],
+                "closed": "true"
+            },
+            {
+                "name": "20",
+                "children": [
+                    {
+                        "name": "",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "",
+                        "closed": "false"
+                    }
+                ],
+                "closed": "true"
+            }
+        ],
+        "closed": "false"
+    },
+    {
+        "name": "节点8",
+        "children": [
+            {
+                "name": "21",
+                "children": [
+                    {
+                        "name": "",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "",
+                        "closed": "false"
+                    }
+                ],
+                "closed": "true"
+            },
+            {
+                "name": "22",
+                "children": [
+                    {
+                        "name": "x1",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "x2",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "x3",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "x4",
+                        "closed": "false"
+                    }
+                ],
+                "closed": "false"
+            }
+        ],
+        "closed": "false"
+    },
+    {
+        "name": "节点9",
+        "children": [
+            {
+                "name": "",
+                "children": [
+                    {
+                        "name": "",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "",
+                        "closed": "false"
+                    }
+                ],
+                "closed": "false"
+            },
+            {
+                "name": "",
+                "children": [
+                    {
+                        "name": "",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "",
+                        "closed": "false"
+                    }
+                ],
+                "closed": "false"
+            }
+        ],
+        "closed": "true"
+    },
+    {
+        "name": "节点10",
+        "children": [
+            {
+                "name": "",
+                "children": [
+                    {
+                        "name": "",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "",
+                        "closed": "false"
+                    }
+                ],
+                "closed": "false"
+            },
+            {
+                "name": "",
+                "children": [
+                    {
+                        "name": "",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "",
+                        "closed": "false"
+                    }
+                ],
+                "closed": "true"
+            }
+        ],
+        "closed": "true"
+    },
+    {
+        "name": "节点11",
+        "children": [
+            {
+                "name": "",
+                "children": [
+                    {
+                        "name": "",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "",
+                        "closed": "false"
+                    }
+                ],
+                "closed": "true"
+            },
+            {
+                "name": "",
+                "children": [
+                    {
+                        "name": "",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "",
+                        "closed": "false"
+                    },
+                    {
+                        "name": "",
+                        "closed": "false"
+                    }
+                ],
+                "closed": "false"
+            }
+        ],
+        "closed": "true"
+    }
+], "closed": "false"}
