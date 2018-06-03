@@ -79,6 +79,7 @@ app.controller(
     'visCategoryPageController',
     function visCategoryPageController($scope, $http, $routeParams, $location, $rootScope) {
         $rootScope.page_name = "用户登录";
+        $scope.charts = []
 
 
     }
