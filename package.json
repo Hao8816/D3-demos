@@ -23,6 +23,8 @@
   },
   "homepage": "https://github.com/Hao8816/D3-demos#readme",
   "devDependencies": {
+    "angular": "1.6.0",
+    "angular-route": "1.6.0",
     "css-loader": "^0.28.11",
     "style-loader": "^0.21.0",
     "webpack": "^4.12.1",
