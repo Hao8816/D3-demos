@@ -17,8 +17,48 @@ app.config(['$routeProvider', function ($routeProvider) {
             templateUrl: 'views/visualization/category.html',
             controller: 'visCategoryPageController'
         }).
+        when('/vis/share/', {
+            templateUrl: 'views/visualization/share.html',
+            controller: 'shareCategoryPageController'
+        }).
+        when('/chart/line/', {
+            templateUrl: 'views/chart/line.html',
+            controller: 'lineChartCategoryPageController'
+        }).
+        when('/chart/bar/', {
+            templateUrl: 'views/chart/bar.html',
+            controller: 'barChartCategoryPageController'
+        }).
+        when('/chart/pie/', {
+            templateUrl: 'views/chart/pie.html',
+            controller: 'pieChartCategoryPageController'
+        }).
+        when('/chart/group/', {
+            templateUrl: 'views/chart/group.html',
+            controller: 'groupChartCategoryPageController'
+        }).
+        when('/chart/drag/', {
+            templateUrl: 'views/chart/drag.html',
+            controller: 'dragChartCategoryPageController'
+        }).
+        when('/chart/realtime/', {
+            templateUrl: 'views/chart/realtime.html',
+            controller: 'realtimeChartCategoryPageController'
+        }).
+        when('/chart/force/', {
+            templateUrl: 'views/chart/force.html',
+            controller: 'forceChartCategoryPageController'
+        }).
+        when('/chart/tree/', {
+            templateUrl: 'views/chart/tree.html',
+            controller: 'treeChartCategoryPageController'
+        }).
+        when('/chart/relation/', {
+            templateUrl: 'views/chart/relation.html',
+            controller: 'relationChartCategoryPageController'
+        }).
 
-        otherwise({redirectTo: '/index/'});
+        otherwise({redirectTo: '/vis/category/'});
 }]);
 
 
@@ -349,9 +389,288 @@ app.controller(
     'visCategoryPageController',
     function visCategoryPageController($scope, $http, $routeParams, $location, $rootScope) {
         $rootScope.page_name = "用户登录";
-        $scope.charts = []
+        $scope.charts = [
+            {"name":"line","title":"折线图","description":"这是我的折线图"},
+            {"name":"bar","title":"柱状图","description":"这是我的柱状图"},
+            {"name":"pie","title":"饼状图","description":"这是我的饼状图"},
+            {"name":"group","title":"分组柱状图","description":"这是我的分组柱状图"},
+            {"name":"drag","title":"可拖动柱状图","description":"这是我的可拖动柱状图"},
+            {"name":"realtime","title":"实时监控图","description":"这是我的实时监控图"},
+            {"name":"force","title":"力图","description":"这是我的力图"},
+            //{"name":"relation","title":"关系图","description":"这是我的关系图"},
+            {"name":"tree","title":"树形图","description":"这是我的树形图"},
+        ]
 
 
     }
 );
+
+
+app.controller(
+    'lineChartCategoryPageController',
+    function lineChartCategoryPageController($scope, $http, $routeParams, $location, $rootScope) {
+        $rootScope.page_name = "折线图";
+        $scope.charts = []
+
+        var w = 400;
+        var h = 300;
+        var padding = 5;
+        var margin = 20;
+
+        var monthSales = [
+            {'month':1,'sales': 0},
+            {'month':2,'sales': 80},
+            {'month':3,'sales': 80},
+            {'month':4,'sales': 110},
+            {'month':5,'sales': 120},
+            {'month':6,'sales': 130},
+            {'month':7,'sales': 100},
+            {'month':8,'sales': 130},
+            {'month':9,'sales': 120},
+            {'month':10,'sales': 110}
+
+        ];
+
+
+        var dataset = [5,10,15,20,25,30];
+
+
+        var xScale = d3.scale.linear()
+            .domain([0, d3.max(monthSales,function(d){return d.month})])
+            .range([0,w]);
+        var yScale =d3.scale.linear()
+            .domain([0, d3.max(monthSales,function(d){return d.sales})])
+            .range([h,0]);
+
+        var xAxis = d3.svg.axis()
+            .orient('bottom')
+            .scale(xScale)
+
+        var yAxis = d3.svg.axis()
+            .orient('left')
+            .scale(yScale)
+
+        var svg = d3.select('#line_chart')
+            .append('svg')
+            .attr('width',w+2*margin)
+            .attr('height',h+2*margin);
+
+        svg.append('g')
+            .attr("class", "x axis")
+            .attr("transform", "translate("+margin+", "+(h+margin)+")")
+            .call(xAxis);
+
+        svg.append('g')
+            .attr("class", "y axis")
+            .attr("transform", "translate("+margin+", "+margin+")")
+            .call(yAxis);
+
+        // 线条
+        var line = d3.svg.line()
+            .x(function(d){return xScale(d.month)+margin})
+            .y(function(d){return yScale(d.sales)+margin});
+
+        var hoverLine = d3.svg.line()
+            .x(function(d){return xScale(d.month)+margin})
+            .y(function(d){return yScale(d.sales)+margin});
+
+        var path = svg.append('path')
+            .datum(monthSales)
+            .attr("d", line)
+            .attr('stroke','red')
+            .attr('stroke-width',2)
+            .attr('fill','none');
+
+        var point = svg.selectAll('.point')
+            .data(monthSales)
+            .enter()
+            .append('circle')
+            .attr('class','point')
+            .attr('cx',function(d){
+                return xScale(d.month)+margin
+            })
+            .attr('cy',function(d){
+                return yScale(d.sales)+margin
+            })
+            .attr('r',4)
+            .attr('fill','#dddddd')
+            .attr('stroke-opacity','0.2')
+            .on('mouseover',function(){
+                var point_x = parseFloat(d3.select(this).attr('cx'));
+                var point_y = parseFloat(d3.select(this).attr('cy'));
+                svg.append('path')
+                    .attr('id','hover-line')
+                    .attr('d', function(d){
+                        var hover = d3.svg.line()
+                        return hover([0,point_y],[point_x,point_y],[point_x,0])
+                    })
+            })
+    }
+);
+
+app.controller(
+    'pieChartCategoryPageController',
+    function pieChartCategoryPageController($scope, $http, $routeParams, $location, $rootScope) {
+
+        var width = 500;
+        var height = 500;
+
+        var dataset = [
+            ['华为','90'],
+            ['华为1','30'],
+            ['华为2','40'],
+            ['华为3','50'],
+            ['华为4','60'],
+            ['华为5','70'],
+            ['华为6','110'],
+            ['华为7','30'],
+            ['华为21','30'],
+            ['华为22','30'],
+            ['华为23','30'],
+            ['华为24','30'],
+            ['华为25','30'],
+            ['华为26','30'],
+            ['华为27','30'],
+            ['华为28','30'],
+            ['华为29','30'],
+            ['华为30','30'],
+            ['华为31','30'],
+            ['华为32','30'],
+            ['华为8','50'],
+            ['华为9','70'],
+            ['华为11','60'],
+            ['华为12','30'],
+        ]
+
+        var colors = d3.range(100).map(d3.scale.category20())
+
+        var outerRadius = width/3
+        var innerTadius = 0
+        var arc = d3.svg.arc().innerRadius(innerTadius).outerRadius(outerRadius)
+
+        var pie = d3.layout.pie().value(function(d){return d[1]})
+        var pie_data = pie(dataset)
+        // 清空画布
+        var svg = d3.select("#pie_chart").append("svg").attr("width",width).attr("height",height)
+        var arcs = svg.selectAll("g")
+            .data(pie_data)
+            .enter()
+            .append("g")
+            .attr("transform","translate("+(width/2)+","+(height/2)+")")
+            .on("mouseover",function(d,i){
+                d3.select(this).attr('fill','red')
+            })
+            .on("mouseout",function(d,i){
+                d3.select(this).transition().duration(500).attr('fill','#666666')
+            })
+        arcs.append("path").attr("fill",function(d,i){return colors[i]}).attr('d',function(d){return arc(d)})
+
+        var label_points = [];
+        arcs.append('text').attr('class','pie-label').text(function(d){
+            var x = arc.centroid(d)[0]*2.4
+            var y = arc.centroid(d)[1]*2.4
+            label_points.push({
+                name : d.data[0],
+                x : x,
+                y : y
+            })
+        }).attr('fill','#ffffff')
+
+        // 将label_points拆分成两部分， x>0 和 x <0
+
+        var left_points = [];
+        var right_points = [];
+        label_points.forEach(function(d){
+            if (d.x >0){
+                right_points.push(d)
+            }else{
+                left_points.push(d)
+            }
+        });
+
+        // 排序操作
+        left_points.sort(function(a,b){
+            return a.y - b.y
+        })
+        right_points.sort(function(a,b){
+            return a.y - b.y
+        })
+
+        var point_hash = {}
+        // 上下点之间的距离
+        left_points.forEach(function(d,index){
+            if (index==0){
+                point_hash[d.name] = [d.x, d.y]
+            }else{
+                // 比较
+                if (d.y - left_points[index-1].y < 20){
+                    d.y = left_points[index-1].y + 20
+                }
+                point_hash[d.name] = [d.x, d.y]
+
+            }
+        })
+
+        right_points.forEach(function(d,index){
+            if (index==0){
+                point_hash[d.name] = [d.x, d.y]
+            }else{
+                // 比较
+                if (d.y - right_points[index-1].y < 20){
+                    d.y = left_points[index-1].y + 20
+                }
+                // 如果x距离太近，需要调整一下
+                point_hash[d.name] = [d.x, d.y]
+            }
+        })
+
+        arcs.append('text').attr('transform',function(d){
+            console.log('xxx',d.data[0])
+            var points = point_hash[d.data[0]];
+            console.log(points)
+            var x = points[0];
+            var y = points[1];
+            if(x<0){
+                if (Math.abs(x)+70>width/2){
+                    x = -(width/2)+70
+                }
+            }else{
+                if (Math.abs(x)+80>=width/2){
+                    x = width/2-80
+                }
+            }
+            return "translate("+x+","+y+")"
+
+        }).attr('text-anchor',function(d){
+            var x = arc.centroid(d)[0]*2.4
+            console.log(d)
+            if (x>0){
+                return 'start'
+            }else{
+                return 'end'
+            }
+        }).attr('font-size','12px').text(function(d){
+            var percent = Number(d.value)/d3.sum(dataset,function(d){return d[1]})*100
+            return d.data[0] + '' + percent.toFixed(1)+'%'
+        })
+
+        arcs.append("line").attr('stroke','#666666')
+            .attr('x1',function(d){return arc.centroid(d)[0]*2})
+            .attr('y1',function(d){return arc.centroid(d)[1]*2})
+            .attr('x2',function(d){
+                var points = point_hash[d.data[0]];
+                console.log(points)
+                var x = points[0];
+                return x
+            })
+            .attr('y2',function(d){
+                var points = point_hash[d.data[0]];
+                console.log(points)
+                var y = points[1];
+
+                return y
+            })
+    }
+);
+
 

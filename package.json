@@ -1,0 +1,32 @@
+{
+  "name": "yiyue",
+  "version": "1.0.0",
+  "description": "壹月空间",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "webpack webpack.config.js",
+    "server": "webpack-dev-server --open"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Hao8816/D3-demos.git"
+  },
+  "keywords": [
+    "d3",
+    "zone"
+  ],
+  "author": "Vaster Chen",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Hao8816/D3-demos/issues"
+  },
+  "homepage": "https://github.com/Hao8816/D3-demos#readme",
+  "devDependencies": {
+    "css-loader": "^0.28.11",
+    "style-loader": "^0.21.0",
+    "webpack": "^4.12.1",
+    "webpack-cli": "^3.0.8",
+    "webpack-dev-server": "^3.1.4"
+  }
+}

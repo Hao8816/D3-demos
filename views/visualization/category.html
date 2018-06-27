@@ -2,17 +2,17 @@
     .card-item{
         background-color: #fff;
         padding: 35px;
-        margin-bottom: 35px;
+        margin-bottom: 15px;
         width: 100%;
     }
 </style>
 
 <div class="row">
     <div class="col-8">
-        <!--<div ng-repeat="chart in charts">-->
-        <div class="card-item">
-            <div></div>
-
+        <div class="card-item" ng-repeat="chart in charts">
+            <div>{{chart.title}}</div>
+            <div>{{chart.description}}</div>
+            <div><a href="#!/chart/{{chart.name}}/">查看详情</a></div>
         </div>
     </div>
     <div class="col-4"></div>

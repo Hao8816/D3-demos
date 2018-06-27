@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <style type="text/css">
+        .edge-label{
+            visibility: hidden;
+        }
+        .edge-label:hover{
+            visibility: visible;
+        }
+    </style>
+</head>
+<body>
+<div class="chart-wrapper">
+    <button onclick="renderChart(1)">图1</button>
+    <button onclick="renderChart(2)">图2</button>
+    <div id="force_chart"></div>
+</div>
+<script type="text/javascript" src="../../lib/d3/d3.v3.min.js"></script>
+<script type="text/javascript">
+
+    // force_chart
+    var w = 1000,
+            h = 600;
+    var font_size = 13;
+    var svg = d3.select("#force_chart").append("svg")
+            .attr("width", w)
+            .attr("height", h)
+            .attr('class','force_chart_svg');
+
+    // 计算字符串的长度，中文2个字符，英文1个字符
+    String.prototype.gblen = function() {
+        var len = 0;
+        for (var i=0; i<this.length; i++) {
+            if (this.charCodeAt(i)>127 || this.charCodeAt(i)==94) {
+                len += 2;
+            } else {
+                len ++;
+            }
+        }
+        return len;
+    };
+
+
+     var dataset1 = {"nodes": [{"reporttime": "2018-03-28 15:18", "name": "苏宁", "level": 0, "childnum": 100, "id": 0, "size": 64}, {"size": 45, "level": 1, "name": "总监", "reporttime": "2018-03-28 15:18", "id": 1}, {"size": 45, "level": 1, "name": "峰会", "reporttime": "2018-05-26 12:18", "id": 2}, {"size": 45, "level": 1, "name": "专项计划”提供转让服务的公告", "reporttime": "2018-01-26 08:57", "id": 3}, {"size": 45, "level": 1, "name": "年度业绩快报", "reporttime": "2018-02-27 20:28", "id": 4}, {"size": 45, "level": 1, "name": "发布社会责任报告", "reporttime": "2018-03-31 10:31", "id": 5}, {"reporttime": "2018-04-12 23:07", "name": "碧桂园", "level": 1, "childnum": 3, "id": 6, "size": 45}, {"size": 45, "level": 1, "name": "协议", "reporttime": "2018-05-09 21:18", "id": 7}, {"size": 45, "level": 1, "name": "长虹", "reporttime": "2018-05-19 17:06", "id": 8}, {"size": 45, "level": 1, "name": "合作", "reporttime": "2018-05-22 10:28", "id": 9}, {"size": 35, "level": 2, "name": "苏宁", "reporttime": "2018-04-13 07:26", "id": 10}, {"reporttime": "2017-11-03 22:46", "name": "建行", "level": 2, "childnum": 96, "id": 11, "size": 35}, {"size": 25, "level": 3, "name": "净利", "reporttime": "2018-03-28 12:57", "id": 12}, {"size": 25, "level": 3, "name": "利润", "reporttime": "2017-03-29 22:35", "id": 13}, {"size": 25, "level": 3, "name": "系统", "reporttime": "2018-05-25 10:16", "id": 14}, {"size": 25, "level": 3, "name": "新品牌", "reporttime": "2018-05-25 10:16", "id": 15}, {"size": 25, "level": 3, "name": "首发", "reporttime": "2018-01-12 16:46", "id": 16}, {"size": 25, "level": 3, "name": "新版", "reporttime": "2017-10-01 19:48", "id": 17}, {"size": 25, "level": 3, "name": "新产品", "reporttime": "2016-11-10 08:54", "id": 18}, {"size": 25, "level": 3, "name": "融资", "reporttime": "2017-12-13 10:42", "id": 19}, {"size": 25, "level": 3, "name": "业务", "reporttime": "2017-01-19 19:40", "id": 20}, {"size": 25, "level": 3, "name": "投资", "reporttime": "2018-05-25 10:16", "id": 21}, {"size": 25, "level": 3, "name": "开售", "reporttime": "2018-05-24 06:30", "id": 22}], "edges": [{"url": "https://voice.hupu.com/china/2280571.html", "source": 0, "reporttime": "2018-03-28 15:18", "relation": "人事变动负面", "target": 1}, {"url": "http://news.huaxi100.com/qiye/car/20180526/1527308361.html", "source": 0, "reporttime": "2018-05-26 12:18", "relation": "企业会议中性", "target": 2}, {"url": "http://js.ifeng.com/a/20180526/6607906_0.shtml", "source": 0, "reporttime": "2018-05-26 21:09", "relation": "企业会议中性", "target": 2}, {"url": "http://news.ikanchai.com/2018/0527/215655.shtml", "source": 0, "reporttime": "2018-05-27 18:27", "relation": "企业会议中性", "target": 2}, {"url": "http://www.donews.com/news/detail/4/3002744.html", "source": 0, "reporttime": "2018-05-28 15:53", "relation": "企业会议中性", "target": 2}, {"url": "http://stock.hexun.com/2018-01-26/192318838.html", "source": 0, "reporttime": "2018-01-26 08:57", "relation": "企业公告信息中性", "target": 3}, {"url": "http://tech.sina.com.cn/i/2018-02-27/doc-ifyrwsqi9690351.shtml", "source": 0, "reporttime": "2018-02-27 20:28", "relation": "企业公告信息中性", "target": 4}, {"url": "http://tech.sina.com.cn/i/2018-02-27/doc-ifyrwsqi9690351.shtml", "source": 0, "reporttime": "2018-02-27 20:28", "relation": "企业公告信息正面", "target": 4}, {"url": "http://finance.ifeng.com/a/20180331/16054166_0.shtml", "source": 0, "reporttime": "2018-03-31 10:31", "relation": "企业公告信息正面", "target": 5}, {"url": "http://tech.sina.com.cn/i/2018-04-12/doc-ifyteqtq9097865.shtml", "source": 0, "reporttime": "2018-04-12 23:07", "relation": "企业合作正面", "target": 6}, {"url": "http://www.njdaily.cn/2018/0509/1697941.shtml", "source": 0, "reporttime": "2018-05-09 21:18", "relation": "企业合作正面", "target": 7}, {"url": "http://www.chinanews.com/business/2018/05-11/8511676.shtml", "source": 0, "reporttime": "2018-05-11 16:08", "relation": "企业合作正面", "target": 7}, {"url": "http://www.js.xinhuanet.com/2018-05/19/c_1122857452.htm", "source": 0, "reporttime": "2018-05-19 17:06", "relation": "企业合作正面", "target": 8}, {"url": "http://finance.qq.com/a/20180522/018530.htm", "source": 0, "reporttime": "2018-05-22 10:28", "relation": "企业合作正面", "target": 9}, {"url": "http://tech.qq.com/a/20180522/018272.htm", "source": 0, "reporttime": "2018-05-22 10:38", "relation": "企业合作正面", "target": 9}, {"url": "http://house.qq.com/a/20180413/002135.htm", "source": 6, "reporttime": "2018-04-13 07:26", "relation": "投资并购正面", "target": 10}, {"url": "http://house.qq.com/a/20180413/002135.htm", "source": 6, "reporttime": "2018-04-13 07:26", "relation": "投资并购中性", "target": 10}, {"url": "http://www.gd.xinhuanet.com/newscenter/2017-11/03/c_1121903740.htm", "source": 6, "reporttime": "2017-11-03 22:46", "relation": "企业合作正面", "target": 11}, {"url": "http://www.cs.com.cn/sylm/jsbd/201803/t20180328_5759739.html", "source": 11, "reporttime": "2018-03-28 12:57", "relation": "销售进展正面", "target": 12}, {"url": "http://www.financialnews.com.cn/yh/sd/201703/t20170329_115184.html", "source": 11, "reporttime": "2017-03-29 22:35", "relation": "销售进展正面", "target": 13}, {"url": "http://news.lyd.com.cn/system/2018/05/25/030475981.shtml", "source": 11, "reporttime": "2018-05-25 10:16", "relation": "研发进展正面", "target": 14}, {"url": "http://news.lyd.com.cn/system/2018/05/25/030475980.shtml", "source": 11, "reporttime": "2018-05-25 10:16", "relation": "研发进展正面", "target": 15}, {"url": "http://unn.people.com.cn/n1/2018/0112/c14748-29762235.html", "source": 11, "reporttime": "2018-01-12 16:46", "relation": "研发进展正面", "target": 16}, {"url": "http://ah.anhuinews.com/qmt/system/2017/11/29/007759789.shtml", "source": 11, "reporttime": "2017-11-29 17:09", "relation": "研发进展正面", "target": 14}, {"url": "http://www.mpaypass.com.cn/news/201710/01195033.html", "source": 11, "reporttime": "2017-10-01 19:48", "relation": "研发进展正面", "target": 17}, {"url": "http://news.yktworld.com/201611/201611100859389773.html", "source": 11, "reporttime": "2016-11-10 08:54", "relation": "研发进展正面", "target": 18}, {"url": "http://www.cs.com.cn/ssgs/fcgs/201712/t20171213_5621219.html", "source": 11, "reporttime": "2017-12-13 10:42", "relation": "投资并购负面", "target": 19}, {"url": "http://news.10jqka.com.cn/20170119/c596176898.shtml", "source": 11, "reporttime": "2017-01-19 19:40", "relation": "投资并购负面", "target": 20}, {"url": "http://news.cnstock.com/news,bwkx-197001-4011661.htm", "source": 11, "reporttime": "2017-01-19 19:31", "relation": "投资并购负面", "target": 20}, {"url": "http://news.lyd.com.cn/system/2018/05/25/030475981.shtml", "source": 11, "reporttime": "2018-05-25 10:16", "relation": "投资并购正面", "target": 21}, {"url": "http://stock.hexun.com/2017-11-03/191497762.html", "source": 11, "reporttime": "2017-11-03 13:25", "relation": "投资并购正面", "target": 21}, {"url": "http://house.ifeng.com/detail/2017_12_22/51328212_0.shtml", "source": 11, "reporttime": "2017-12-22 08:02", "relation": "投资并购中性", "target": 20}, {"url": "http://finance.china.com.cn/roll/20180524/4647101.shtml", "source": 11, "reporttime": "2018-05-24 06:30", "relation": "市场营销负面", "target": 22}]}
+     var dataset2 = {"nodes": [{"reporttime": "2018-03-28 15:18", "name": "苏宁", "level": 0, "childnum": 100, "id": 0, "size": 64}, {"size": 45, "level": 1, "name": "总监", "reporttime": "2018-03-28 15:18", "id": 1}, {"size": 45, "level": 1, "name": "峰会", "reporttime": "2018-05-26 12:18", "id": 2}, {"size": 45, "level": 1, "name": "专项计划”提供转让服务的公告", "reporttime": "2018-01-26 08:57", "id": 3}, {"size": 45, "level": 1, "name": "年度业绩快报", "reporttime": "2018-02-27 20:28", "id": 4}, {"size": 45, "level": 1, "name": "发布社会责任报告", "reporttime": "2018-03-31 10:31", "id": 5}, {"reporttime": "2018-04-12 23:07", "name": "碧桂园", "level": 1, "childnum": 3, "id": 6, "size": 45}, {"size": 45, "level": 1, "name": "协议", "reporttime": "2018-05-09 21:18", "id": 7}, {"size": 45, "level": 1, "name": "长虹", "reporttime": "2018-05-19 17:06", "id": 8}, {"size": 45, "level": 1, "name": "合作", "reporttime": "2018-05-22 10:28", "id": 9}, {"size": 35, "level": 2, "name": "苏宁", "reporttime": "2018-04-13 07:26", "id": 10}, {"reporttime": "2017-11-03 22:46", "name": "建行", "level": 2, "childnum": 96, "id": 11, "size": 35}, {"size": 25, "level": 3, "name": "净利", "reporttime": "2018-03-28 12:57", "id": 12}, {"size": 25, "level": 3, "name": "利润", "reporttime": "2017-03-29 22:35", "id": 13}, {"size": 25, "level": 3, "name": "系统", "reporttime": "2018-05-25 10:16", "id": 14}, {"size": 25, "level": 3, "name": "新品牌", "reporttime": "2018-05-25 10:16", "id": 15}, {"size": 25, "level": 3, "name": "首发", "reporttime": "2018-01-12 16:46", "id": 16}, {"size": 25, "level": 3, "name": "新版", "reporttime": "2017-10-01 19:48", "id": 17}, {"size": 25, "level": 3, "name": "新产品", "reporttime": "2016-11-10 08:54", "id": 18}, {"size": 25, "level": 3, "name": "融资", "reporttime": "2017-12-13 10:42", "id": 19}, {"size": 25, "level": 3, "name": "业务", "reporttime": "2017-01-19 19:40", "id": 20}, {"size": 25, "level": 3, "name": "投资", "reporttime": "2018-05-25 10:16", "id": 21}, {"size": 25, "level": 3, "name": "开售", "reporttime": "2018-05-24 06:30", "id": 22}], "edges": [{"url": "https://voice.hupu.com/china/2280571.html", "source": 0, "reporttime": "2018-03-28 15:18", "relation": "人事变动负面", "target": 1}, {"url": "http://news.huaxi100.com/qiye/car/20180526/1527308361.html", "source": 0, "reporttime": "2018-05-26 12:18", "relation": "企业会议中性", "target": 2}, {"url": "http://js.ifeng.com/a/20180526/6607906_0.shtml", "source": 0, "reporttime": "2018-05-26 21:09", "relation": "企业会议中性", "target": 2}, {"url": "http://news.ikanchai.com/2018/0527/215655.shtml", "source": 0, "reporttime": "2018-05-27 18:27", "relation": "企业会议中性", "target": 2}, {"url": "http://www.donews.com/news/detail/4/3002744.html", "source": 0, "reporttime": "2018-05-28 15:53", "relation": "企业会议中性", "target": 2}, {"url": "http://stock.hexun.com/2018-01-26/192318838.html", "source": 0, "reporttime": "2018-01-26 08:57", "relation": "企业公告信息中性", "target": 3}, {"url": "http://tech.sina.com.cn/i/2018-02-27/doc-ifyrwsqi9690351.shtml", "source": 0, "reporttime": "2018-02-27 20:28", "relation": "企业公告信息中性", "target": 4}, {"url": "http://tech.sina.com.cn/i/2018-02-27/doc-ifyrwsqi9690351.shtml", "source": 0, "reporttime": "2018-02-27 20:28", "relation": "企业公告信息正面", "target": 4}, {"url": "http://finance.ifeng.com/a/20180331/16054166_0.shtml", "source": 0, "reporttime": "2018-03-31 10:31", "relation": "企业公告信息正面", "target": 5}, {"url": "http://tech.sina.com.cn/i/2018-04-12/doc-ifyteqtq9097865.shtml", "source": 0, "reporttime": "2018-04-12 23:07", "relation": "企业合作正面", "target": 6}, {"url": "http://www.njdaily.cn/2018/0509/1697941.shtml", "source": 0, "reporttime": "2018-05-09 21:18", "relation": "企业合作正面", "target": 7}, {"url": "http://www.chinanews.com/business/2018/05-11/8511676.shtml", "source": 0, "reporttime": "2018-05-11 16:08", "relation": "企业合作正面", "target": 7}, {"url": "http://www.js.xinhuanet.com/2018-05/19/c_1122857452.htm", "source": 0, "reporttime": "2018-05-19 17:06", "relation": "企业合作正面", "target": 8}, {"url": "http://finance.qq.com/a/20180522/018530.htm", "source": 0, "reporttime": "2018-05-22 10:28", "relation": "企业合作正面", "target": 9}, {"url": "http://tech.qq.com/a/20180522/018272.htm", "source": 0, "reporttime": "2018-05-22 10:38", "relation": "企业合作正面", "target": 9}, {"url": "http://house.qq.com/a/20180413/002135.htm", "source": 6, "reporttime": "2018-04-13 07:26", "relation": "投资并购正面", "target": 10}, {"url": "http://house.qq.com/a/20180413/002135.htm", "source": 6, "reporttime": "2018-04-13 07:26", "relation": "投资并购中性", "target": 10}, {"url": "http://www.gd.xinhuanet.com/newscenter/2017-11/03/c_1121903740.htm", "source": 6, "reporttime": "2017-11-03 22:46", "relation": "企业合作正面", "target": 11}, {"url": "http://www.cs.com.cn/sylm/jsbd/201803/t20180328_5759739.html", "source": 11, "reporttime": "2018-03-28 12:57", "relation": "销售进展正面", "target": 12}, {"url": "http://www.financialnews.com.cn/yh/sd/201703/t20170329_115184.html", "source": 11, "reporttime": "2017-03-29 22:35", "relation": "销售进展正面", "target": 13}, {"url": "http://news.lyd.com.cn/system/2018/05/25/030475981.shtml", "source": 11, "reporttime": "2018-05-25 10:16", "relation": "研发进展正面", "target": 14}, {"url": "http://news.lyd.com.cn/system/2018/05/25/030475980.shtml", "source": 11, "reporttime": "2018-05-25 10:16", "relation": "研发进展正面", "target": 15}, {"url": "http://unn.people.com.cn/n1/2018/0112/c14748-29762235.html", "source": 11, "reporttime": "2018-01-12 16:46", "relation": "研发进展正面", "target": 16}, {"url": "http://ah.anhuinews.com/qmt/system/2017/11/29/007759789.shtml", "source": 11, "reporttime": "2017-11-29 17:09", "relation": "研发进展正面", "target": 14}, {"url": "http://www.mpaypass.com.cn/news/201710/01195033.html", "source": 11, "reporttime": "2017-10-01 19:48", "relation": "研发进展正面", "target": 17}, {"url": "http://news.yktworld.com/201611/201611100859389773.html", "source": 11, "reporttime": "2016-11-10 08:54", "relation": "研发进展正面", "target": 18}, {"url": "http://www.cs.com.cn/ssgs/fcgs/201712/t20171213_5621219.html", "source": 11, "reporttime": "2017-12-13 10:42", "relation": "投资并购负面", "target": 19}, {"url": "http://news.10jqka.com.cn/20170119/c596176898.shtml", "source": 11, "reporttime": "2017-01-19 19:40", "relation": "投资并购负面", "target": 20}, {"url": "http://news.cnstock.com/news,bwkx-197001-4011661.htm", "source": 11, "reporttime": "2017-01-19 19:31", "relation": "投资并购负面", "target": 20}, {"url": "http://news.lyd.com.cn/system/2018/05/25/030475981.shtml", "source": 11, "reporttime": "2018-05-25 10:16", "relation": "投资并购正面", "target": 21}, {"url": "http://stock.hexun.com/2017-11-03/191497762.html", "source": 11, "reporttime": "2017-11-03 13:25", "relation": "投资并购正面", "target": 21}, {"url": "http://house.ifeng.com/detail/2017_12_22/51328212_0.shtml", "source": 11, "reporttime": "2017-12-22 08:02", "relation": "投资并购中性", "target": 20}, {"url": "http://finance.china.com.cn/roll/20180524/4647101.shtml", "source": 11, "reporttime": "2018-05-24 06:30", "relation": "市场营销负面", "target": 22}]}
+
+//    var dataset1 = {
+//        "nodes": [
+//            {"name": "苹果xxxxxxx", "size": 40, "level": 1, "id": 0},
+//            {"name": "三星", "size": 40, "level": 2, "id": 1},
+//            {"name": "摩托罗拉", "size": 40, "level": 2, "id": 2},
+//            {"name": "华为", "size": 64, "level": 0, "id": 3},
+//            {"name": "李彦宏", "size": 40, "level": 1, "id": 4},
+//            {"name": "百度", "size": 40, "level": 1, "id": 5},
+//            {"name": "支付宝", "size": 40, "level": 1, "id": 6},
+//            {"name": "马云", "size": 40, "level": 1, "id": 7},
+//            {"name": "我是最长的描述", "size": 40, "level": 1, "id": 8},
+//            {"name": "测试", "size": 40, "level": 1, "id": 9}
+//        ],
+//        "edges": [
+//            {"source": 0, "target": 1, "relation": "关系1"},
+//            {"source": 0, "target": 2, "relation": "关系2"},
+//            {"source": 0, "target": 3, "relation": "关系3"},
+//            {"source": 4, "target": 3, "relation": "关系4"},
+//            {"source": 5, "target": 3, "relation": "关系5"},
+//            {"source": 6, "target": 3, "relation": "关系6"},
+//            {"source": 7, "target": 3, "relation": "关系7"},
+//            {"source": 8, "target": 3, "relation": "关系8"},
+//            {"source": 9, "target": 3, "relation": "关系9"}
+//        ]
+//    };
+
+//    var dataset2 = {
+//        "nodes": [
+//            {"name": "xxxxxxx", "size": 40, "level": 1, "id": 0},
+//            {"name": "三星1", "size": 40, "level": 2, "id": 1},
+//            {"name": "摩托罗拉1", "size": 40, "level": 2, "id": 2},
+//            {"name": "华为1", "size": 64, "level": 0, "id": 3},
+//            {"name": "李彦宏1", "size": 40, "level": 1, "id": 4},
+//            {"name": "百度1", "size": 40, "level": 1, "id": 5},
+//        ],
+//        "edges": [
+//            {"source": 0, "target": 1, "relation": "关系1"},
+//            {"source": 0, "target": 2, "relation": "关系2"},
+//            {"source": 0, "target": 3, "relation": "关系3"},
+//            {"source": 4, "target": 3, "relation": "关系4"},
+//            {"source": 5, "target": 3, "relation": "关系5"}
+//        ]
+//    };
+
+
+    function renderChart(type){
+        if(type == 1){
+            render(dataset1)
+        }else{
+            render(dataset2)
+        }
+    }
+
+    function render(dataset){
+        var colors = ['#faa01b','#18968f','#ea726a','#ddd'];
+
+        var force = d3.layout.force()
+                .nodes(dataset.nodes)
+                .links(dataset.edges)
+                .size([w, h])
+                .linkDistance([180])
+                .linkStrength(0.8)
+                .charge([-800])
+                .friction([0.5])
+                .gravity([0.08])
+                .start();
+
+        svg.selectAll('*').remove()//这里就是用来清空原先绘图的元素的
+
+        var edges = svg.selectAll("line")
+                .data(dataset.edges);
+        edges.exit().remove();
+        edges.enter()
+                .append("line")
+                .style("stroke", "#ddd")
+                .style("stroke-width", 1);
+
+        var nodes = svg.selectAll(".node")
+                .data(dataset.nodes);
+
+        nodes.exit().remove();
+        nodes.enter()
+                .append("g")
+                .attr('class','node')
+                .attr("transform", function (node) {
+                    node.weight = 0
+                    return "translate(" + node.x + "," + node.y + ")";
+                })
+                .call(force.drag);
+
+        nodes.append('circle')
+                .attr('class','circle')
+                .attr("r", function(d){
+                    return d.size/2;
+                }).attr('fill',function(d){
+                    console.log(colors[d.level])
+                    console.log(d.level)
+                    return colors[d.level]
+                });
+
+        // 添加文字描述
+        nodes.append('text')
+                .text(function(d){
+                    return d.name;
+                })
+                .attr('fill','#666')
+                .attr('stroke','none')
+                .attr('font-size',font_size+'px')
+                .attr('x',function(d){
+                    return  -font_size*d.name.gblen()/4;
+                }).attr('y',function(d){
+                    return d.size/2+font_size+5
+                });
+
+        // 添加线条上面的文字描述
+        var edge_labels = svg.selectAll(".edge-label")
+                .data(dataset.edges)
+                .enter()
+                .append("a")
+                .attr('class','edge-label')
+                .attr("xlink:href", function(d) { return d.url; })
+                .attr("target", "_blank")
+                .append("text")
+                .text(function(d){return d.relation});
+
+
+        force.on("tick", function() {
+            edges.attr("x1", function(d) { return d.source.x; })
+                    .attr("y1", function(d) { return d.source.y; })
+                    .attr("x2", function(d) { return d.target.x; })
+                    .attr("y2", function(d) { return d.target.y; });
+
+            nodes.attr("transform", function (d) {
+                        return "translate(" + d.x + "," + d.y + ")";
+                    });
+
+            edge_labels.attr("x", function(d) { return (d.source.x+ d.target.x)/2; })
+                    .attr("y", function(d) { return (d.source.y+ d.target.y)/2; })
+        });
+
+        // 鼠标点击事件
+        nodes.on("click", function(d) {
+
+            console.log("我被点击了"+d.name+d.size);
+//        $timeout(function(){
+//            $scope.selected_node = d;
+//        },1)
+
+        });
+    }
+
+
+</script>
+</body>
+</html>
+
