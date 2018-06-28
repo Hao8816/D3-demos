@@ -1,19 +1,24 @@
-require('angular');
-require('angular-route');
-require('./main.css');
-var app = angular.module('web', ['ngRoute']);
+require.ensure([], function(require) {
+    require('angular');
+    require('angular-route');
+    require('./main.css');
 
-// 配置路由
-app.config(['$routeProvider', function($routeProvider){
-    $routeProvider.
-        when('/index/', {
-            templateUrl: './app/views/app.html',
-            controller: 'indexPageController'
-        }).
-        otherwise({redirectTo: '/index/'});
+    var app = angular.module('web', ['ngRoute']);
 
-}]);
-app.controller("indexPageController",function($scope){
-    $scope.names = [1,2,3,4,5,6,7,8,9];
+    // 配置路由
+    app.config(['$routeProvider', function($routeProvider){
+        $routeProvider.
+            when('/index/', {
+                templateUrl: './app/views/app.html',
+                controller: 'indexPageController'
+            }).
+            otherwise({redirectTo: '/index/'});
+
+    }]);
+
+    app.controller("indexPageController",function($scope){
+        $scope.names = [1,2,3,4,5,6,7,8,9];
+    });
+
+
 });
-
